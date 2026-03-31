@@ -34,17 +34,17 @@ export function RoleProgressCard({
           href={path}
           className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900/40 dark:text-zinc-50 hover:dark:bg-zinc-900"
         >
-          Continue
+          Continuar
         </Link>
       </div>
 
       <div className="mt-4">
         <div className="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-300">
           <span>
-            Progress: {completed}/{total} ({pct}%)
+            Progresso: {completed}/{total} ({pct}%)
           </span>
           <span className="font-medium text-zinc-900 dark:text-zinc-50">
-            {completed === total ? "Complete" : "In progress"}
+            {completed === total ? "Concluído" : "Em progresso"}
           </span>
         </div>
         <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">

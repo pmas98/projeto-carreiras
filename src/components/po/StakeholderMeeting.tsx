@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, AlertTriangle, XCircle, Lightbulb, ChevronRight } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertTriangle, XCircle, Lightbulb, ChevronRight, Sparkles } from "lucide-react";
 import { useProgressStore } from "@/store/useProgressStore";
 import {
   DIALOGUE_TREE,
@@ -25,12 +25,12 @@ type Message = {
 // ─── Mood helpers ─────────────────────────────────────────────────────────────
 
 function getMoodLabel(score: number): string {
-  if (score < 20) return "Furious 😡";
-  if (score < 40) return "Frustrated 😤";
-  if (score < 55) return "Skeptical 😒";
-  if (score < 70) return "Cautious 😐";
-  if (score < 85) return "Engaged 😊";
-  return "Excited 🤩";
+  if (score < 20) return "Furioso 😡";
+  if (score < 40) return "Frustrado 😤";
+  if (score < 55) return "Cético 😒";
+  if (score < 70) return "Cauteloso 😐";
+  if (score < 85) return "Engajado 😊";
+  return "Animado 🤩";
 }
 
 function getMoodBarColor(score: number): string {
@@ -47,7 +47,7 @@ function MoodGauge({ score }: { score: number }) {
   return (
     <div className="flex items-center gap-3 rounded-xl bg-white/5 px-4 py-2.5 backdrop-blur">
       <span className="text-xs font-medium text-slate-300 uppercase tracking-wider whitespace-nowrap">
-        Stakeholder Mood
+        Humor do Stakeholder
       </span>
       <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-white/10">
         <motion.div
@@ -120,7 +120,7 @@ function ChatBubble({ message, index }: { message: Message; index: number }) {
         )}
         {!isStakeholder && (
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
-            You · Product Owner
+            Você · Product Owner
           </p>
         )}
         <p className="text-sm leading-relaxed">{message.text}</p>
@@ -158,17 +158,17 @@ const CHOICE_LABEL_STYLES = {
   good: {
     badge: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40",
     card: "hover:border-emerald-500/70 hover:bg-emerald-950/40",
-    label: "GOOD MOVE",
+    label: "BOA JOGADA",
   },
   risky: {
     badge: "bg-red-500/20 text-red-300 ring-1 ring-red-500/40",
     card: "hover:border-red-500/70 hover:bg-red-950/30",
-    label: "RISKY",
+    label: "ARRISCADO",
   },
   neutral: {
     badge: "bg-slate-500/20 text-slate-300 ring-1 ring-slate-500/40",
     card: "hover:border-slate-400/60 hover:bg-slate-800/60",
-    label: "NEUTRAL",
+    label: "NEUTRO",
   },
 };
 
@@ -182,7 +182,7 @@ function ChoicePanel({
   return (
     <div className="space-y-2">
       <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-        Your Response
+        Sua Resposta
       </p>
       <div className="grid gap-2 sm:grid-cols-1">
         {choices.map((choice, i) => {
@@ -245,7 +245,7 @@ function EndScreen({
   alreadyDone,
 }: {
   endType: EndType;
-  summary: { scope: string[]; outcome: string; reflection: string };
+  summary: { scope: string[]; outcome: string; sprintResult: string; reflection: string };
   onComplete: () => void;
   alreadyDone: boolean;
 }) {
@@ -266,10 +266,21 @@ function EndScreen({
         </span>
       </div>
 
+      {/* Sprint Result */}
+      <div className="mt-4 rounded-xl bg-indigo-500/10 p-3 ring-1 ring-indigo-500/20">
+        <div className="flex items-center gap-2 text-xs font-semibold text-indigo-400">
+          <Sparkles className="h-3.5 w-3.5" />
+          Resultado da Entrega
+        </div>
+        <p className="mt-1.5 text-sm font-medium leading-relaxed text-indigo-200">
+          {summary.sprintResult}
+        </p>
+      </div>
+
       {/* MVP Scope */}
       <div className="mt-4">
         <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Q1 MVP Scope Agreed
+          Escopo do MVP Q1 Acordado
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
           {summary.scope.map((feature) => (
@@ -287,7 +298,7 @@ function EndScreen({
       <div className="mt-4 rounded-xl bg-white/5 p-3">
         <div className="flex items-center gap-2 text-xs font-semibold text-amber-400">
           <Lightbulb className="h-3.5 w-3.5" />
-          PO Reflection
+          Reflexão do PO
         </div>
         <p className="mt-1.5 text-sm leading-relaxed text-slate-300">
           {summary.reflection}
@@ -299,7 +310,7 @@ function EndScreen({
         {alreadyDone ? (
           <div className="flex items-center gap-2 text-sm text-emerald-400">
             <CheckCircle2 className="h-4 w-4" />
-            Task already completed
+            Tarefa já concluída
           </div>
         ) : (
           <motion.button
@@ -309,14 +320,14 @@ function EndScreen({
             className="flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/50 transition hover:bg-indigo-500"
           >
             <CheckCircle2 className="h-4 w-4" />
-            Complete Task
+            Concluir Tarefa
           </motion.button>
         )}
         <Link
           href="/product-owner"
           className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5"
         >
-          Back to PO Hub
+          Voltar ao Hub do PO
         </Link>
       </div>
     </motion.div>
@@ -435,17 +446,17 @@ export function StakeholderMeeting() {
             className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-slate-400 transition hover:bg-white/5 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            PO Hub
+            Hub do PO
           </Link>
           <div className="h-4 w-px bg-white/10" />
           <h1 className="text-sm font-semibold text-white">
-            🤝 Task 1 — The Stakeholder Meeting
+            🤝 Tarefa 1 — A Reunião com Stakeholder
           </h1>
           <div className="ml-auto">
             {(taskCompleted || isAlreadyDone) && (
               <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/40">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Complete
+                Concluído
               </span>
             )}
           </div>

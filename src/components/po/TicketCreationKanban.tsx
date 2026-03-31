@@ -39,7 +39,7 @@ const COLUMNS: ColumnDef[] = [
   },
   {
     id: "inProgress",
-    label: "In Progress",
+    label: "Em Execução",
     color: "text-blue-400",
     headerBg: "bg-blue-900/50",
     cardBorder: "border-l-blue-500",
@@ -48,7 +48,7 @@ const COLUMNS: ColumnDef[] = [
   },
   {
     id: "review",
-    label: "Review",
+    label: "Revisão",
     color: "text-amber-400",
     headerBg: "bg-amber-900/40",
     cardBorder: "border-l-amber-500",
@@ -57,7 +57,7 @@ const COLUMNS: ColumnDef[] = [
   },
   {
     id: "done",
-    label: "Done",
+    label: "Concluído",
     color: "text-emerald-400",
     headerBg: "bg-emerald-900/40",
     cardBorder: "border-l-emerald-500",
@@ -116,7 +116,7 @@ function KanbanCardView({
           <button
             onClick={() => setExpanded((v) => !v)}
             className="rounded p-0.5 text-slate-400 hover:bg-white/10 hover:text-white transition"
-            title={expanded ? "Collapse" : "Expand"}
+            title={expanded ? "Recolher" : "Expandir"}
           >
             {expanded ? (
               <Minimize2 className="h-3.5 w-3.5" />
@@ -148,7 +148,7 @@ function KanbanCardView({
           >
             <div className="mt-3 space-y-1.5 border-t border-white/10 pt-3">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-                Acceptance Criteria
+                Critérios de Aceite
               </p>
               {card.acceptanceCriteria.map((ac, i) => (
                 <div key={i} className="flex items-start gap-2">
@@ -174,7 +174,7 @@ function KanbanCardView({
             }`}
           >
             <ChevronLeft className="h-3.5 w-3.5" />
-            Back
+            Voltar
           </button>
           <button
             onClick={() => onMove(card.id, "right")}
@@ -185,7 +185,7 @@ function KanbanCardView({
                 : "cursor-not-allowed text-slate-700"
             }`}
           >
-            {colIndex === COLUMN_ORDER.length - 2 ? "Done ✓" : "Move →"}
+            {colIndex === COLUMN_ORDER.length - 2 ? "Concluir ✓" : "Mover →"}
             <ChevronRight className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -195,7 +195,7 @@ function KanbanCardView({
       {card.column === "done" && (
         <div className="mt-2 flex items-center gap-1.5 border-t border-emerald-800/50 pt-2 text-xs text-emerald-400">
           <CheckCircle2 className="h-3.5 w-3.5" />
-          Shipped to sprint
+          Enviado para a sprint
         </div>
       )}
     </motion.div>
@@ -256,11 +256,11 @@ export function TicketCreationKanban() {
             className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-slate-400 transition hover:bg-white/5 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            PO Hub
+            Hub do PO
           </Link>
           <div className="h-4 w-px bg-white/10" />
           <h1 className="text-sm font-semibold text-white">
-            🗂️ Task 3 — Ticket Creation
+            🗂️ Tarefa 3 — Criação de Tickets
           </h1>
 
           {/* Progress bar */}
@@ -273,14 +273,14 @@ export function TicketCreationKanban() {
               />
             </div>
             <span className="text-xs font-medium text-slate-400">
-              {doneCount}/{totalCount} done
+              {doneCount}/{totalCount} concluídos
             </span>
           </div>
 
           {(taskCompleted || isAlreadyDone) && (
             <span className="ml-auto flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/40">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              Complete
+              Concluído
             </span>
           )}
         </div>
@@ -292,12 +292,12 @@ export function TicketCreationKanban() {
           <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
           <div>
             <p className="text-sm font-semibold text-amber-300">
-              What makes a great ticket?
+              O que faz um ótimo ticket?
             </p>
             <p className="mt-1 text-sm text-amber-200/80 leading-relaxed">
-              Every ticket needs a clear <strong>user story</strong> ("As a [user], I can [action] so that [outcome]")
-              and measurable <strong>acceptance criteria</strong>. Move each ticket through
-              Backlog → In Progress → Review → Done by clicking the arrow buttons. Expand a card to see its full story and acceptance criteria.
+              Cada ticket precisa de uma <strong>história de usuário</strong> clara ("Como um [usuário], eu posso [ação] para que [resultado]")
+              e <strong>critérios de aceite</strong> mensuráveis. Mova cada ticket através de
+              Backlog → Em Execução → Revisão → Concluído clicando nos botões de seta. Expanda um cartão para ver sua história completa e critérios de aceite.
             </p>
           </div>
         </div>
@@ -341,7 +341,7 @@ export function TicketCreationKanban() {
                       animate={{ opacity: 1 }}
                       className="flex-1 rounded-xl border-2 border-dashed border-white/10 px-3 py-6 text-center text-xs text-slate-600"
                     >
-                      {colDef.id === "done" ? "Move cards here to complete" : "Empty"}
+                      {colDef.id === "done" ? "Mova os cartões para cá para concluir" : "Vazio"}
                     </motion.div>
                   )}
                 </div>
@@ -363,20 +363,20 @@ export function TicketCreationKanban() {
                 <span className="text-3xl">🎉</span>
                 <div>
                   <p className="font-bold text-emerald-300">
-                    All {totalCount} tickets moved to Done!
+                    Todos os {totalCount} tickets foram concluídos!
                   </p>
                   <p className="mt-0.5 text-sm text-emerald-400/80">
-                    The sprint backlog is ready. Your engineering team has everything they need to start building Carreiras.
+                    O backlog da sprint está pronto. Sua equipe de engenharia tem tudo o que precisa para começar a construir o Carreiras.
                   </p>
                 </div>
               </div>
 
               <div className="mt-4 rounded-xl bg-white/5 p-4">
                 <p className="text-xs font-semibold text-slate-400">
-                  💡 PO Reflection
+                  💡 Reflexão do PO
                 </p>
                 <p className="mt-1.5 text-sm text-slate-300 leading-relaxed">
-                  Great job keeping your stories user-centered and your acceptance criteria measurable. In the real world, you'd facilitate a sprint planning session to estimate each ticket collaboratively with your engineering team. Story points represent complexity and risk, not time.
+                  Ótimo trabalho mantendo suas histórias centradas no usuário e seus critérios de aceite mensuráveis. No mundo real, você facilitaria uma sessão de planejamento de sprint para estimar cada ticket de forma colaborativa com sua equipe de engenharia. Pontos de história representam complexidade e risco, não tempo.
                 </p>
               </div>
 
@@ -384,7 +384,7 @@ export function TicketCreationKanban() {
                 {taskCompleted || isAlreadyDone ? (
                   <div className="flex items-center gap-2 text-sm text-emerald-400">
                     <CheckCircle2 className="h-4 w-4" />
-                    Task complete — PO path finished!
+                    Tarefa concluída — trilha de PO finalizada!
                   </div>
                 ) : (
                   <motion.button
@@ -401,7 +401,7 @@ export function TicketCreationKanban() {
                   href="/product-owner"
                   className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5"
                 >
-                  Back to PO Hub
+                  Voltar ao Hub do PO
                 </Link>
               </div>
             </motion.div>

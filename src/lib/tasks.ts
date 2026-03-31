@@ -24,69 +24,69 @@ export const TASKS_BY_ROLE: Record<CareerRole, TaskDef[]> = {
   productOwner: [
     {
       id: "po_stakeholder_meeting",
-      title: "The Stakeholder Meeting",
-      subtitle: "Negotiate scope to an MVP without angering the stakeholder.",
+      title: "A Reunião com Stakeholder",
+      subtitle: "Negocie o escopo para um MVP sem irritar o stakeholder.",
     },
     {
       id: "po_defining_product",
-      title: "Defining the Product",
-      subtitle: "Synthesize MVP requirements from personas & business model notes.",
+      title: "Definindo o Produto",
+      subtitle: "Sintetize os requisitos do MVP a partir de personas e notas do modelo de negócio.",
     },
     {
       id: "po_ticket_creation",
-      title: "Ticket Creation",
-      subtitle: "Convert requirements into User Stories and Acceptance Criteria.",
+      title: "Criação de Tickets",
+      subtitle: "Converta requisitos em Histórias de Usuário e Critérios de Aceite.",
     },
   ],
   devOps: [
     {
       id: "devops_outage",
-      title: "The Outage",
-      subtitle: "Receive a simulated PagerDuty-style alert.",
+      title: "A Interrupção",
+      subtitle: "Receba um alerta simulado no estilo PagerDuty.",
     },
     {
       id: "devops_terminal",
-      title: "The Terminal",
-      subtitle: "Use a browser CLI with basic commands like `ls` and `cat`.",
+      title: "O Terminal",
+      subtitle: "Use uma CLI de navegador com comandos básicos como `ls` e `cat`.",
     },
     {
       id: "devops_investigation_resolution",
-      title: "Investigation & Resolution",
-      subtitle: "Run the right command(s) to fix the machine.",
+      title: "Investigação e Resolução",
+      subtitle: "Execute os comandos certos para consertar a máquina.",
     },
   ],
   frontend: [
     {
       id: "frontend_broken_ui",
-      title: "The Broken UI",
-      subtitle: "A deliberately bad component—misaligned, ugly colors, confusing layout.",
+      title: "A Interface Quebrada",
+      subtitle: "Um componente deliberadamente ruim — desalinhado, cores feias, layout confuso.",
     },
     {
       id: "frontend_code_editor",
-      title: "The Code Editor",
-      subtitle: "Edit raw CSS/React/Frontr Motion values in a lightweight editor.",
+      title: "O Editor de Código",
+      subtitle: "Edite valores brutos de CSS/React/Framer Motion em um editor leve.",
     },
     {
       id: "frontend_fix",
-      title: "The Fix",
-      subtitle: "Adjust the specific values to match the design mockup.",
+      title: "A Correção",
+      subtitle: "Ajuste os valores específicos para corresponder ao mockup do design.",
     },
   ],
   backend: [
     {
       id: "backend_api_client",
-      title: "The API Client",
-      subtitle: "Simulated Postman/Insomnia UI for building requests.",
+      title: "O Cliente de API",
+      subtitle: "Interface simulada de Postman/Insomnia para construir requisições.",
     },
     {
       id: "backend_auth",
-      title: "Authentication",
-      subtitle: "Create a POST payload that returns a mock JWT.",
+      title: "Autenticação",
+      subtitle: "Crie um payload POST que retorne um mock de JWT.",
     },
     {
       id: "backend_data_fetching",
-      title: "Data Fetching",
-      subtitle: "Attach the JWT and filter a local dataset.",
+      title: "Busca de Dados",
+      subtitle: "Anexe o JWT e filtre um conjunto de dados local.",
     },
   ],
 };
@@ -98,22 +98,22 @@ export const ROLE_META: Record<
   productOwner: {
     label: "Product Owner",
     path: "/product-owner",
-    description: "Stakeholders, scoping, and agile thinking.",
+    description: "Stakeholders, escopo e pensamento ágil.",
   },
   devOps: {
     label: "DevOps",
     path: "/devops",
-    description: "Incidents, logs, and system recovery.",
+    description: "Incidentes, logs e recuperação de sistemas.",
   },
   frontend: {
-    label: "Frontend Developer",
+    label: "Desenvolvedor Frontend",
     path: "/frontend",
-    description: "UI/UX, CSS control, and live feedback.",
+    description: "UI/UX, controle de CSS e feedback em tempo real.",
   },
   backend: {
-    label: "Backend Developer",
+    label: "Desenvolvedor Backend",
     path: "/backend",
-    description: "APIs, auth, and data filtering flows.",
+    description: "APIs, autenticação e fluxos de filtragem de dados.",
   },
 };
 

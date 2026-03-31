@@ -32,7 +32,7 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
         <div>
           <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
             <Link className="hover:underline" href="/">
-              Dashboard
+              Painel
             </Link>
             <span aria-hidden="true">/</span>
             <span>{meta.label}</span>
@@ -47,7 +47,7 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
 
         <div className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-right shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
           <div className="text-xs text-zinc-600 dark:text-zinc-300">
-            Completed
+            Concluído
           </div>
           <div className="mt-0.5 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
             {doneCount}/{tasks.length}
@@ -98,8 +98,8 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
                   <>
                     <div>
                       {done
-                        ? "Task complete — you can replay it anytime."
-                        : "Interactive simulation — animated & visual."}
+                        ? "Tarefa concluída — você pode repeti-la a qualquer momento."
+                        : "Simulação interativa — animada e visual."}
                     </div>
                     <Link
                       href={poRoute}
@@ -110,15 +110,15 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
                       }`}
                     >
                       <ArrowRight className="h-3.5 w-3.5" />
-                      {done ? "Replay" : "Start Task"}
+                      {done ? "Repetir" : "Iniciar Tarefa"}
                     </Link>
                   </>
                 ) : (
                   <>
                     <div>
                       {done
-                        ? "Marked complete (persisted via localStorage)."
-                        : "Placeholder for Phase 3/4 implementation."}
+                        ? "Marcado como concluído (persistido no localStorage)."
+                        : "Espaço reservado para implementação das Fases 3/4."}
                     </div>
                     {!done ? (
                       <button
@@ -127,7 +127,7 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
                         className="inline-flex items-center gap-2 self-start rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-800 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
                       >
                         <Wand2 className="h-3.5 w-3.5" />
-                        Mark complete (demo)
+                        Marcar como concluído (demo)
                       </button>
                     ) : null}
                   </>
@@ -144,8 +144,8 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
         </div>
         <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
           {role === "productOwner"
-            ? "Each PO task is a fully interactive simulation. The stakeholder meeting is a branching dialogue, the product definition is a sticky-note board, and ticket creation is an animated Kanban."
-            : "You'll get role-specific hints while working on each task. For now, this page is a routing + progress skeleton."}
+            ? "Cada tarefa de PO é uma simulação totalmente interativa. A reunião com stakeholders é um diálogo ramificado, a definição do produto é um mural de post-its e a criação de tickets é um Kanban animado."
+            : "Você receberá dicas específicas da função enquanto trabalha em cada tarefa. Por enquanto, esta página é uma estrutura de roteamento e progresso."}
         </p>
       </div>
     </div>

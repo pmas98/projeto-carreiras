@@ -23,24 +23,24 @@ export default function Dashboard() {
         <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Day in the Life of Tech
+              Um Dia na Vida na Tecnologia
             </h1>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-              Pick a career path and progress through role-specific tasks.
-              Everything is client-side and persists via local storage.
+              Escolha uma carreira e progrida através de tarefas específicas de cada função.
+              Tudo é processado via cliente e persiste no armazenamento local.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
-              Progress: {totalCompleted}/{totalTasks}
+              Progresso: {totalCompleted}/{totalTasks}
             </div>
             <button
               type="button"
               onClick={resetProgress}
               className="rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-800 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
             >
-              Reset
+              Redefinir
             </button>
           </div>
         </header>
@@ -67,8 +67,8 @@ export default function Dashboard() {
         </section>
 
         <footer className="mt-8 text-xs text-zinc-500 dark:text-zinc-400">
-          Phase 1 + 2 are wired: routing skeleton + Zustand + localStorage
-          persistence. Role tasks will be implemented next.
+          As Fases 1 + 2 estão conectadas: estrutura de roteamento + Zustand + persistência no localStorage. 
+          As tarefas das funções serão implementadas em breve.
         </footer>
       </div>
     </div>

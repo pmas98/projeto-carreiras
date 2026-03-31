@@ -74,7 +74,7 @@ function PersonaCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="font-bold text-white">{persona.name}</p>
-            <span className="text-xs text-slate-400">{persona.age}yo</span>
+            <span className="text-xs text-slate-400">{persona.age} anos</span>
           </div>
           <p className={`mt-0.5 text-xs font-medium bg-gradient-to-r bg-clip-text text-transparent ${persona.gradient}`}>
             {persona.role}
@@ -163,7 +163,7 @@ function RequirementRow({
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
       <div className="min-w-0 flex-1">
         <p className="text-sm leading-relaxed text-white">{req.text}</p>
-        <p className="mt-0.5 text-[10px] text-slate-500">Source: {req.source}</p>
+        <p className="mt-0.5 text-[10px] text-slate-500">Fonte: {req.source}</p>
       </div>
     </motion.div>
   );
@@ -268,16 +268,16 @@ export function DefiningProduct() {
             className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-slate-400 transition hover:bg-white/5 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            PO Hub
+            Hub do PO
           </Link>
           <div className="h-4 w-px bg-white/10" />
           <h1 className="text-sm font-semibold text-white">
-            📌 Task 2 — Defining the Product
+            📌 Tarefa 2 — Definindo o Produto
           </h1>
           {(taskCompleted || isAlreadyDone) && (
             <span className="ml-auto flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/40">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              Complete
+              Concluído
             </span>
           )}
         </div>
@@ -285,9 +285,9 @@ export function DefiningProduct() {
 
       <div className="mx-auto max-w-6xl px-4 py-8">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-white">Who are we building for?</h2>
+          <h2 className="text-xl font-bold text-white">Para quem estamos construindo?</h2>
           <p className="mt-1 text-sm text-slate-400">
-            Select user personas and a business model. The insights board will populate with their key needs. Then extract the MVP requirements.
+            Selecione as personas e um modelo de negócio. O quadro de insights será preenchido com suas principais necessidades. Em seguida, extraia os requisitos do MVP.
           </p>
         </div>
 
@@ -299,7 +299,7 @@ export function DefiningProduct() {
               <div className="mb-3 flex items-center gap-2">
                 <User className="h-4 w-4 text-slate-400" />
                 <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                  User Personas
+                  Personas de Usuário
                 </h3>
               </div>
               <div className="space-y-2">
@@ -319,7 +319,7 @@ export function DefiningProduct() {
               <div className="mb-3 flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-slate-400" />
                 <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                  Business Model
+                  Modelo de Negócio
                 </h3>
               </div>
               <div className="space-y-2">
@@ -340,7 +340,7 @@ export function DefiningProduct() {
             {/* Insights Board (cork board) */}
             <div>
               <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">
-                Insights Board
+                Quadro de Insights
               </h3>
               <div
                 className="relative min-h-[260px] rounded-2xl p-5"
@@ -355,7 +355,7 @@ export function DefiningProduct() {
                   <div className="flex h-full min-h-[200px] flex-col items-center justify-center gap-2 text-center">
                     <span className="text-3xl opacity-40">📌</span>
                     <p className="text-sm text-amber-900/60">
-                      Select personas and a business model to add notes to the board
+                      Selecione personas e um modelo de negócio para adicionar notas ao quadro
                     </p>
                   </div>
                 )}
@@ -386,20 +386,20 @@ export function DefiningProduct() {
                   {isExtracting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Synthesizing requirements…
+                      Sintetizando requisitos…
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4" />
                       {canExtract
-                        ? "Extract MVP Requirements"
-                        : "Select at least 1 persona + 1 model to continue"}
+                        ? "Extrair Requisitos do MVP"
+                        : "Selecione pelo menos 1 persona + 1 modelo para continuar"}
                     </>
                   )}
                 </motion.button>
                 {!canExtract && (
                   <p className="mt-2 text-xs text-slate-500">
-                    Select at least one persona and one business model first.
+                    Selecione pelo menos uma persona e um modelo de negócio primeiro.
                   </p>
                 )}
               </div>
@@ -416,7 +416,7 @@ export function DefiningProduct() {
                   <div className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-indigo-400" />
                     <h3 className="text-sm font-bold text-white">
-                      MVP Requirements — Synthesized
+                      Requisitos do MVP — Sintetizados
                     </h3>
                   </div>
 
@@ -429,10 +429,10 @@ export function DefiningProduct() {
                   {/* Mentor tip */}
                   <div className="rounded-xl bg-amber-500/10 px-4 py-3 ring-1 ring-amber-500/30">
                     <p className="text-xs font-semibold text-amber-400">
-                      💡 PO Tip
+                      💡 Dica do PO
                     </p>
                     <p className="mt-1 text-sm text-amber-200 leading-relaxed">
-                      Good requirements focus on user outcomes, not implementation. Each one above describes <em>what</em> the user needs — not <em>how</em> to build it. Your engineers will figure out the how.
+                      Bons requisitos focam nos resultados para o usuário, não na implementação. Cada um acima descreve <em>o que</em> o usuário precisa — não <em>como</em> construir. Seus engenheiros descobrirão o como.
                     </p>
                   </div>
 
@@ -441,7 +441,7 @@ export function DefiningProduct() {
                     {taskCompleted || isAlreadyDone ? (
                       <div className="flex items-center gap-2 text-sm text-emerald-400">
                         <CheckCircle2 className="h-4 w-4" />
-                        Task complete — move to Ticket Creation next
+                        Tarefa concluída — siga para a Criação de Tickets
                       </div>
                     ) : (
                       <motion.button
@@ -451,14 +451,14 @@ export function DefiningProduct() {
                         className="flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/50 transition hover:bg-indigo-500"
                       >
                         <CheckCircle2 className="h-4 w-4" />
-                        Complete Task
+                        Concluir Tarefa
                       </motion.button>
                     )}
                     <Link
                       href="/product-owner/ticket-creation"
                       className="flex items-center gap-2 rounded-full border border-indigo-500/40 px-5 py-2.5 text-sm font-medium text-indigo-300 transition hover:bg-indigo-900/30"
                     >
-                      Next: Ticket Creation →
+                      Próximo: Criação de Tickets →
                     </Link>
                   </div>
                 </motion.div>

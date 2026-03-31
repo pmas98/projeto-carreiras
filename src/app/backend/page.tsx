@@ -2,7 +2,7 @@ import { RoleTasksPanel } from "@/components/RoleTasksPanel";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Backend",
+  title: "Desenvolvimento Backend",
 };
 
 export default function BackendPage() {

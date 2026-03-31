@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Day in the Life of Tech",
+  title: "Um Dia na Vida na Tecnologia",
   description:
-    "A client-side educational simulation of Product Owner, DevOps, Frontend, and Backend work.",
+    "Uma simulação educacional das funções de Product Owner, DevOps, Frontend e Backend.",
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black dark:text-zinc-50">
