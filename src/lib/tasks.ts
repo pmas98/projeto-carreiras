@@ -7,9 +7,9 @@ export type TaskId =
   | "devops_outage"
   | "devops_terminal"
   | "devops_investigation_resolution"
-  | "frontend_broken_ui"
-  | "frontend_code_editor"
-  | "frontend_fix"
+  | "frontend_inspector"
+  | "frontend_framer"
+  | "frontend_a11y"
   | "backend_api_client"
   | "backend_auth"
   | "backend_data_fetching";
@@ -57,19 +57,19 @@ export const TASKS_BY_ROLE: Record<CareerRole, TaskDef[]> = {
   ],
   frontend: [
     {
-      id: "frontend_broken_ui",
-      title: "A Interface Quebrada",
-      subtitle: "Um componente deliberadamente ruim — desalinhado, cores feias, layout confuso.",
+      id: "frontend_inspector",
+      title: "Inspetor de Design",
+      subtitle: "Ajuste o layout para alinhar perfeitamente com o mockup.",
     },
     {
-      id: "frontend_code_editor",
-      title: "O Editor de Código",
-      subtitle: "Edite valores brutos de CSS/React/Framer Motion em um editor leve.",
+      id: "frontend_framer",
+      title: "Micro-interações",
+      subtitle: "Adicione polimento premium usando Framer Motion.",
     },
     {
-      id: "frontend_fix",
-      title: "A Correção",
-      subtitle: "Ajuste os valores específicos para corresponder ao mockup do design.",
+      id: "frontend_a11y",
+      title: "O Pesadelo do Leitor de Tela",
+      subtitle: "Conserte a semântica para tornar a página acessível.",
     },
   ],
   backend: [
