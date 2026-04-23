@@ -11,6 +11,9 @@ const TARGET_VALUES = {
   padding: 32,
   gap: 16,
   borderRadius: 12,
+  borderWidth: 4,
+  fontSize: 24,
+  boxShadow: 20, // intensity for mapping
 };
 
 export function InspectorTask() {
@@ -18,6 +21,9 @@ export function InspectorTask() {
     padding: 16,
     gap: 8,
     borderRadius: 0,
+    borderWidth: 1,
+    fontSize: 16,
+    boxShadow: 0,
   });
   
   const [showMockup, setShowMockup] = useState(false);
@@ -30,7 +36,10 @@ export function InspectorTask() {
     validate: (s) => 
       s.padding === TARGET_VALUES.padding && 
       s.gap === TARGET_VALUES.gap && 
-      s.borderRadius === TARGET_VALUES.borderRadius
+      s.borderRadius === TARGET_VALUES.borderRadius &&
+      s.borderWidth === TARGET_VALUES.borderWidth &&
+      s.fontSize === TARGET_VALUES.fontSize &&
+      s.boxShadow === TARGET_VALUES.boxShadow
   });
 
   const definitions = {
@@ -48,6 +57,21 @@ export function InspectorTask() {
       title: "O que é Border Radius?",
       content: "O Border Radius arredonda os cantos de um elemento. Cantos mais arredondados costumam passar uma sensação mais amigável e moderna.",
       hint: "O design usa cantos levemente arredondados. Experimente o valor 12px."
+    },
+    borderWidth: {
+      title: "O que é Border Width?",
+      content: "Define a espessura da borda do elemento. Bordas mais grossas podem ser usadas para dar ênfase ou um estilo mais 'cartunesco'.",
+      hint: "O mockup tem uma borda bem visível. Tente 4px."
+    },
+    fontSize: {
+      title: "O que é Font Size?",
+      content: "Controla o tamanho do texto. É fundamental para criar hierarquia visual, destacando o que é mais importante.",
+      hint: "O título no design é maior e mais imponente. Experimente 24px."
+    },
+    boxShadow: {
+      title: "O que é Box Shadow?",
+      content: "A sombra cria uma ilusão de profundidade, fazendo o elemento parecer 'flutuar' acima da página.",
+      hint: "O componente original parece ter profundidade. Tente ajustar para 20px."
     }
   };
 
@@ -122,6 +146,66 @@ export function InspectorTask() {
                 O que é isso?
               </button>
             </div>
+
+            {/* Border Width Slider */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Border Width</label>
+                <span className="text-[10px] font-mono text-zinc-400">{values.borderWidth}px</span>
+              </div>
+              <input 
+                type="range" min="0" max="10" step="1"
+                value={values.borderWidth}
+                onChange={(e) => setValues({...values, borderWidth: Number(e.target.value)})}
+                className="w-full accent-zinc-900 dark:accent-zinc-50"
+              />
+              <button 
+                onClick={() => setActiveTooltip(definitions.borderWidth)}
+                className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+              >
+                O que é isso?
+              </button>
+            </div>
+
+            {/* Font Size Slider */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Font Size</label>
+                <span className="text-[10px] font-mono text-zinc-400">{values.fontSize}px</span>
+              </div>
+              <input 
+                type="range" min="12" max="32" step="2"
+                value={values.fontSize}
+                onChange={(e) => setValues({...values, fontSize: Number(e.target.value)})}
+                className="w-full accent-zinc-900 dark:accent-zinc-50"
+              />
+              <button 
+                onClick={() => setActiveTooltip(definitions.fontSize)}
+                className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+              >
+                O que é isso?
+              </button>
+            </div>
+
+            {/* Box Shadow Slider */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Sombra (Depth)</label>
+                <span className="text-[10px] font-mono text-zinc-400">{values.boxShadow}px</span>
+              </div>
+              <input 
+                type="range" min="0" max="40" step="4"
+                value={values.boxShadow}
+                onChange={(e) => setValues({...values, boxShadow: Number(e.target.value)})}
+                className="w-full accent-zinc-900 dark:accent-zinc-50"
+              />
+              <button 
+                onClick={() => setActiveTooltip(definitions.boxShadow)}
+                className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+              >
+                O que é isso?
+              </button>
+            </div>
           </div>
 
           <div className="mt-12 pt-6 border-t border-zinc-100 dark:border-zinc-900">
@@ -146,12 +230,14 @@ export function InspectorTask() {
             style={{ 
               padding: `${values.padding}px`,
               borderRadius: `${values.borderRadius}px`,
-              gap: `${values.gap}px`
+              gap: `${values.gap}px`,
+              borderWidth: `${values.borderWidth}px`,
+              boxShadow: `0 ${values.boxShadow}px ${values.boxShadow * 2}px rgba(0,0,0,0.1)`
             }}
-            className="relative z-10 flex flex-col bg-white shadow-2xl transition-all duration-300 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800"
+            className="relative z-10 flex flex-col bg-white transition-all duration-300 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
           >
             <div className="h-12 w-12 rounded-full bg-zinc-900 dark:bg-zinc-50 mb-2" />
-            <div className="h-4 w-48 bg-zinc-200 dark:bg-zinc-800 rounded mb-1" />
+            <div style={{ fontSize: `${values.fontSize}px` }} className="font-bold text-zinc-900 dark:text-zinc-50 mb-1 leading-tight">Título de Exemplo</div>
             <div className="h-3 w-32 bg-zinc-100 dark:bg-zinc-900 rounded mb-4" />
             
             <div className="flex gap-[inherit]">
@@ -166,12 +252,14 @@ export function InspectorTask() {
               opacity: showMockup ? 0.3 : 0,
               padding: `${TARGET_VALUES.padding}px`,
               borderRadius: `${TARGET_VALUES.borderRadius}px`,
-              gap: `${TARGET_VALUES.gap}px`
+              gap: `${TARGET_VALUES.gap}px`,
+              borderWidth: `${TARGET_VALUES.borderWidth}px`,
+              boxShadow: `0 ${TARGET_VALUES.boxShadow}px ${TARGET_VALUES.boxShadow * 2}px rgba(0,0,0,0.1)`
             }}
-            className="absolute z-20 pointer-events-none flex flex-col bg-blue-500 shadow-none transition-all duration-300"
+            className="absolute z-20 pointer-events-none flex flex-col bg-blue-500 shadow-none transition-all duration-300 border-blue-900"
           >
             <div className="h-12 w-12 rounded-full bg-blue-900 mb-2" />
-            <div className="h-4 w-48 bg-blue-900 rounded mb-1" />
+            <div style={{ fontSize: `${TARGET_VALUES.fontSize}px` }} className="font-bold text-blue-900 mb-1 leading-tight">Título de Exemplo</div>
             <div className="h-3 w-32 bg-blue-900 rounded mb-4" />
             <div className="flex gap-[inherit]">
               <div className="h-10 w-24 bg-blue-900 rounded-[inherit]" />
