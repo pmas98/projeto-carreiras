@@ -5,16 +5,22 @@ import { CheckCircle2, ArrowRight, Wand2 } from "lucide-react";
 import { useProgressStore } from "@/store/useProgressStore";
 import { ROLE_META, TASKS_BY_ROLE, type CareerRole, type TaskId } from "@/lib/tasks";
 
-const PO_TASK_ROUTES: Partial<Record<TaskId, string>> = {
+const TASK_ROUTES: Partial<Record<TaskId, string>> = {
   po_stakeholder_meeting: "/product-owner/stakeholder-meeting",
   po_defining_product: "/product-owner/defining-product",
   po_ticket_creation: "/product-owner/ticket-creation",
+  frontend_inspector: "/frontend/frontend_inspector",
+  frontend_framer: "/frontend/frontend_framer",
+  frontend_a11y: "/frontend/frontend_a11y",
 };
 
-const PO_TASK_ICONS: Partial<Record<TaskId, string>> = {
+const TASK_ICONS: Partial<Record<TaskId, string>> = {
   po_stakeholder_meeting: "🤝",
   po_defining_product: "📌",
   po_ticket_creation: "🗂️",
+  frontend_inspector: "🔍",
+  frontend_framer: "✨",
+  frontend_a11y: "♿",
 };
 
 export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
@@ -58,8 +64,8 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
       <div className="mt-6 grid gap-3 md:grid-cols-2">
         {tasks.map((t) => {
           const done = doneSet.has(t.id);
-          const poRoute = PO_TASK_ROUTES[t.id];
-          const poIcon = PO_TASK_ICONS[t.id];
+          const poRoute = TASK_ROUTES[t.id];
+          const poIcon = TASK_ICONS[t.id];
 
           return (
             <div
@@ -143,8 +149,8 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
           Mentor
         </div>
         <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
-          {role === "productOwner"
-            ? "Cada tarefa de PO é uma simulação totalmente interativa. A reunião com stakeholders é um diálogo ramificado, a definição do produto é um mural de post-its e a criação de tickets é um Kanban animado."
+          {role === "productOwner" || role === "frontend"
+            ? `Cada tarefa de ${meta.label} é uma simulação totalmente interativa. No Frontend, você ajustará layouts, animações e acessibilidade com feedback em tempo real.`
             : "Você receberá dicas específicas da função enquanto trabalha em cada tarefa. Por enquanto, esta página é uma estrutura de roteamento e progresso."}
         </p>
       </div>
