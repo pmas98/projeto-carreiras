@@ -4,7 +4,7 @@ import { useState } from "react";
 import { TaskShell } from "../TaskShell";
 import { EducationalTooltip } from "../EducationalTooltip";
 import { useTaskValidation } from "@/hooks/useTaskValidation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Sparkles, Play } from "lucide-react";
 
 export function FramerTask() {

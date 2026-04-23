@@ -27,9 +27,11 @@ export function useTaskValidation<T>({
     const isValid = validate(currentState);
     
     if (isValid) {
-      markTaskComplete(taskId);
-      setJustCompleted(true);
-      if (onSuccess) onSuccess();
+      setTimeout(() => {
+        markTaskComplete(taskId);
+        setJustCompleted(true);
+        if (onSuccess) onSuccess();
+      }, 0);
     }
   }, [currentState, taskId, validate, isComplete, markTaskComplete, onSuccess]);
 

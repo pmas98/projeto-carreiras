@@ -36,7 +36,7 @@ export default async function FrontendTaskPage({ params }: PageProps) {
       
       <div className="mt-8 p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm max-w-2xl w-full">
         <p className="text-sm text-zinc-500 dark:text-zinc-400 italic">
-          O ambiente de trabalho para a tarefa "{task.title}" será implementado nos próximos passos...
+          O ambiente de trabalho para a tarefa &quot;{task.title}&quot; será implementado nos próximos passos...
         </p>
       </div>
     </div>

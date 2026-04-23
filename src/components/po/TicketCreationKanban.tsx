@@ -295,7 +295,7 @@ export function TicketCreationKanban() {
               O que faz um ótimo ticket?
             </p>
             <p className="mt-1 text-sm text-amber-200/80 leading-relaxed">
-              Cada ticket precisa de uma <strong>história de usuário</strong> clara ("Como um [usuário], eu posso [ação] para que [resultado]")
+              Cada ticket precisa de uma <strong>história de usuário</strong> clara (&quot;Como um [usuário], eu posso [ação] para que [resultado]&quot;)
               e <strong>critérios de aceite</strong> mensuráveis. Mova cada ticket através de
               Backlog → Em Execução → Revisão → Concluído clicando nos botões de seta. Expanda um cartão para ver sua história completa e critérios de aceite.
             </p>

@@ -364,31 +364,32 @@ export function StakeholderMeeting() {
     if (!node) return;
 
     // Add this node's message (deduplicated via functional update — safe in Strict Mode)
-    setMessages((prev) => {
-      const alreadyExists = prev.some(
-        (m) => m.nodeId === currentNodeId && m.speaker !== "player"
-      );
-      if (alreadyExists) return prev;
-      return [
-        ...prev,
-        {
-          id: `${currentNodeId}-${Date.now()}`,
-          nodeId: currentNodeId,
-          speaker: node.speaker,
-          text: node.text,
-        },
-      ];
-    });
+    setTimeout(() => {
+      setMessages((prev) => {
+        const alreadyExists = prev.some(
+          (m) => m.nodeId === currentNodeId && m.speaker !== "player"
+        );
+        if (alreadyExists) return prev;
 
-    if (node.tipText) setActiveTip(node.tipText);
-    if (node.isEnd) {
-      setIsComplete(true);
-      return;
-    }
+        return [
+          ...prev,
+          {
+            nodeId: currentNodeId,
+            speaker: "stakeholder",
+            text: node.stakeholderText,
+          },
+        ];
+      });
+
+      if (node.tipText) setActiveTip(node.tipText);
+      if (node.isEnd) {
+        setIsComplete(true);
+      }
+    }, 0);
 
     // Auto-advance nodes without choices (timer re-fires correctly after Strict Mode cleanup)
     if (node.nextId && !node.choices) {
-      setIsTyping(true);
+      setTimeout(() => setIsTyping(true), 0);
       const timer = setTimeout(() => {
         setIsTyping(false);
         setCurrentNodeId(node.nextId!);

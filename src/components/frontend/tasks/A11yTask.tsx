@@ -5,7 +5,7 @@ import { TaskShell } from "../TaskShell";
 import { EducationalTooltip } from "../EducationalTooltip";
 import { useTaskValidation } from "@/hooks/useTaskValidation";
 import { motion } from "framer-motion";
-import { Accessibility, ShieldCheck, UserCheck } from "lucide-react";
+import { Accessibility, ShieldCheck } from "lucide-react";
 
 export function A11yTask() {
   const [code, setCode] = useState('<div onClick={closeModal}>\n  <img src="close.png" />\n</div>\n\n<div className="text-gray-200 bg-gray-100">\n  Texto ilegível\n</div>');
@@ -78,7 +78,6 @@ export function A11yTask() {
           </div>
 
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Visual View */}
             <div className="space-y-4">
               <span className="text-[10px] font-bold text-zinc-400 uppercase">Visão do Usuário</span>
               <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 min-h-[300px]">
@@ -102,20 +101,20 @@ export function A11yTask() {
               <span className="text-[10px] font-bold text-zinc-400 uppercase">O que o Robô ouve</span>
               <div className="bg-zinc-900 p-6 rounded-2xl shadow-xl border border-zinc-800 font-mono text-xs text-green-500 min-h-[300px] space-y-4">
                 <div>&gt; Carregando página...</div>
-                <div className="text-zinc-500 italic">// Árvore de Acessibilidade:</div>
+                <div className="text-zinc-500 italic">Árvore de Acessibilidade:</div>
                 <div className="pl-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-white">- Heading:</span> "Meu Dashboard"
+                    <span className="text-white">- Heading:</span> &quot;Meu Dashboard&quot;
                   </div>
                   
                   <div className="flex items-center gap-2 border border-red-500/30 p-2 rounded bg-red-500/5">
                     <span className="text-white">- {code.includes("<button") ? "Button" : "Generic (Div)"}:</span> 
-                    {code.includes("aria-label") ? '"Fechar modal"' : <span className="text-red-500 animate-pulse underline">"Sem nome/descrição"</span>}
+                    {code.includes("aria-label") ? '&quot;Fechar modal&quot;' : <span className="text-red-500 animate-pulse underline">&quot;Sem nome/descrição&quot;</span>}
                   </div>
 
                   <div className="flex items-center gap-2 border border-orange-500/30 p-2 rounded bg-orange-500/5">
                     <span className="text-white">- Text Content:</span>
-                    {code.includes("text-zinc-900") ? '"Este é um aviso..."' : <span className="text-orange-500 animate-pulse underline">"Contraste muito baixo - Pular leitura"</span>}
+                    {code.includes("text-zinc-900") ? '&quot;Este é um aviso...&quot;' : <span className="text-orange-500 animate-pulse underline">&quot;Contraste muito baixo - Pular leitura&quot;</span>}
                   </div>
                 </div>
               </div>
@@ -138,7 +137,6 @@ export function A11yTask() {
                   <ShieldCheck size={32} />
                 </motion.div>
                 <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Acessibilidade 10/10!</h2>
-                <p className="mt-2 text-zinc-600 dark:text-zinc-400">Agora qualquer pessoa, usando qualquer tecnologia, pode navegar no seu app.</p>
                 <button 
                   onClick={() => window.location.href = "/"}
                   className="mt-6 rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
