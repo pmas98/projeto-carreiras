@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { TASKS_BY_ROLE } from "@/lib/tasks";
 import { InspectorTask } from "@/components/frontend/tasks/InspectorTask";
+import { FramerTask } from "@/components/frontend/tasks/FramerTask";
 
 interface PageProps {
   params: Promise<{ taskId: string }>;
@@ -17,6 +18,10 @@ export default async function FrontendTaskPage({ params }: PageProps) {
 
   if (taskId === "frontend_inspector") {
     return <InspectorTask />;
+  }
+
+  if (taskId === "frontend_framer") {
+    return <FramerTask />;
   }
 
   return (
