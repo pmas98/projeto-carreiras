@@ -28,6 +28,10 @@ export function useTutorialProgress(steps: TutorialStep[], currentCode: string) 
     return false;
   };
 
+  const reset = () => {
+    setCurrentStepIndex(0);
+  };
+
   return {
     currentStep,
     currentStepIndex,
@@ -35,6 +39,7 @@ export function useTutorialProgress(steps: TutorialStep[], currentCode: string) 
     isStepComplete,
     isLastStep,
     goToNextStep,
+    reset,
     progress: ((currentStepIndex) / steps.length) * 100
   };
 }

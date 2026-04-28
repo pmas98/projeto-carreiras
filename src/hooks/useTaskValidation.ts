@@ -9,13 +9,15 @@ interface ValidationOptions<T> {
   currentState: T;
   validate: (state: T) => boolean;
   onSuccess?: () => void;
+  successDelay?: number;
 }
 
 export function useTaskValidation<T>({ 
   taskId, 
   currentState, 
   validate, 
-  onSuccess 
+  onSuccess,
+  successDelay = 0
 }: ValidationOptions<T>) {
   const markTaskComplete = useProgressStore((s) => s.markTaskComplete);
   const isComplete = useProgressStore((s) => s.isTaskComplete(taskId));
@@ -27,13 +29,16 @@ export function useTaskValidation<T>({
     const isValid = validate(currentState);
     
     if (isValid) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         markTaskComplete(taskId);
         setJustCompleted(true);
         if (onSuccess) onSuccess();
-      }, 0);
+      }, successDelay);
+      return () => clearTimeout(timer);
+    } else {
+      setJustCompleted(false);
     }
-  }, [currentState, taskId, validate, isComplete, markTaskComplete, onSuccess]);
+  }, [currentState, taskId, validate, isComplete, markTaskComplete, onSuccess, successDelay]);
 
   return {
     isComplete,

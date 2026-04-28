@@ -26,6 +26,7 @@ type ProgressState = {
   markTaskComplete: (taskId: TaskId) => void;
   markTutorialSeen: (moduleId: string) => void;
   resetTutorial: (moduleId: string) => void;
+  resetTask: (taskId: TaskId) => void;
   resetProgress: () => void;
   isTaskComplete: (taskId: TaskId) => boolean;
   isTutorialSeen: (moduleId: string) => boolean;
@@ -124,6 +125,11 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
     const existing = get().completedTasks;
     if (existing.includes(taskId)) return;
     set({ completedTasks: [...existing, taskId] });
+  },
+  
+  resetTask: (taskId) => {
+    const existing = get().completedTasks;
+    set({ completedTasks: existing.filter(id => id !== taskId) });
   },
 
   markTutorialSeen: (moduleId) => {

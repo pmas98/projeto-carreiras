@@ -6,8 +6,9 @@ import { EducationalTooltip } from "../EducationalTooltip";
 import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
 import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useTaskValidation } from "@/hooks/useTaskValidation";
+import { useProgressStore } from "@/store/useProgressStore";
 import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, RotateCcw } from "lucide-react";
 
 const TARGET_VALUES = {
   padding: 32,
@@ -18,15 +19,18 @@ const TARGET_VALUES = {
   boxShadow: 20, // intensity for mapping
 };
 
+const INITIAL_VALUES = {
+  padding: 16,
+  gap: 8,
+  borderRadius: 0,
+  borderWidth: 1,
+  fontSize: 16,
+  boxShadow: 0,
+};
+
 export function InspectorTask() {
-  const [values, setValues] = useState({
-    padding: 16,
-    gap: 8,
-    borderRadius: 0,
-    borderWidth: 1,
-    fontSize: 16,
-    boxShadow: 0,
-  });
+  const [values, setValues] = useState(INITIAL_VALUES);
+  const resetTask = useProgressStore((s) => s.resetTask);
   
   const [showMockup, setShowMockup] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -37,13 +41,15 @@ export function InspectorTask() {
     taskId: "frontend_inspector",
     currentState: values,
     validate: (s) => 
-      s.padding === TARGET_VALUES.padding && 
-      s.gap === TARGET_VALUES.gap && 
-      s.borderRadius === TARGET_VALUES.borderRadius &&
-      s.borderWidth === TARGET_VALUES.borderWidth &&
-      s.fontSize === TARGET_VALUES.fontSize &&
+      s.fontSize === TARGET_VALUES.fontSize && 
       s.boxShadow === TARGET_VALUES.boxShadow
   });
+
+  const handleReset = () => {
+    setValues(INITIAL_VALUES);
+    setShowMockup(false);
+    resetTask("frontend_inspector");
+  };
 
   const definitions = {
     padding: {
@@ -292,12 +298,22 @@ export function InspectorTask() {
                 </motion.div>
                 <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Perfeito!</h2>
                 <p className="mt-2 text-zinc-600 dark:text-zinc-400">Você alinhou o componente com o design.</p>
-                <button 
-                  onClick={() => window.location.href = "/frontend/frontend_framer"}
-                  className="mt-6 rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                >
-                  Próxima Tarefa
-                </button>
+                
+                <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button 
+                    onClick={handleReset}
+                    className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-6 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
+                  >
+                    <RotateCcw size={16} />
+                    Repetir
+                  </button>
+                  <button 
+                    onClick={() => window.location.href = "/frontend/frontend_framer"}
+                    className="rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+                  >
+                    Próxima Tarefa
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}

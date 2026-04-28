@@ -6,8 +6,10 @@ import { LearningBar } from "../LearningBar";
 import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
 import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useTutorialProgress, TutorialStep } from "@/hooks/useTutorialProgress";
+import { useTaskValidation } from "@/hooks/useTaskValidation";
+import { useProgressStore } from "@/store/useProgressStore";
 import { motion } from "framer-motion";
-import { Accessibility, ShieldCheck } from "lucide-react";
+import { Accessibility, ShieldCheck, RotateCcw } from "lucide-react";
 
 const A11Y_STEPS: TutorialStep[] = [
   {
@@ -36,21 +38,57 @@ const A11Y_STEPS: TutorialStep[] = [
     targetSnippet: "text-zinc-900",
     hint: "Troque 'text-gray-200' por 'text-zinc-900'.",
     validate: (code) => code.includes("text-zinc-900")
+  },
+  {
+    id: "exploration",
+    title: "Vá além!",
+    description: "Tente adicionar outros atributos.",
+    explanation: "Atributos como role='button' ou tabIndex={0} podem ajudar em casos específicos.",
+    targetSnippet: "role='button'",
+    hint: "Experimente adicionar role='alert' na div de texto.",
+    validate: (code) => code.includes("role=") || code.includes("tabIndex=")
   }
 ];
 
+const INITIAL_CODE = '<div onClick={closeModal}>\n  <img src="close.png" />\n</div>\n\n<div className="text-gray-200 bg-gray-100">\n  Texto ilegível\n</div>';
+
 export function A11yTask() {
-  const [code, setCode] = useState('<div onClick={closeModal}>\n  <img src="close.png" />\n</div>\n\n<div className="text-gray-200 bg-gray-100">\n  Texto ilegível\n</div>');
+  const [code, setCode] = useState(INITIAL_CODE);
   const tutorial = useGuidedTutorial("frontend_a11y");
   
   const { 
     currentStep, 
     isStepComplete, 
     isLastStep, 
-    goToNextStep 
+    goToNextStep,
+    reset: resetProgress
   } = useTutorialProgress(A11Y_STEPS, code);
 
-  const isTaskComplete = isLastStep && isStepComplete;
+  // Basic Syntax checking
+  const errors = [];
+  const tags = code.match(/<[a-zA-Z0-9]+/g) || [];
+  const closingTags = code.match(/<\/[a-zA-Z0-9]+/g) || [];
+  if (tags.length > closingTags.length) errors.push("Você tem tags abertas sem fechamento.");
+  
+  if ((code.match(/aria-label=/g) || []).length > 1) {
+    errors.push("Cuidado: você definiu múltiplos aria-labels no mesmo elemento!");
+  }
+
+  const resetTask = useProgressStore((s) => s.resetTask);
+  const { isComplete: isTaskCompleteStore } = useTaskValidation({
+    taskId: "frontend_a11y",
+    currentState: code,
+    validate: () => isLastStep && isStepComplete && errors.length === 0,
+    successDelay: 1000
+  });
+
+  const handleReset = () => {
+    setCode(INITIAL_CODE);
+    resetProgress();
+    resetTask("frontend_a11y");
+  };
+
+  const isTaskComplete = isTaskCompleteStore;
 
   return (
     <TaskShell 
@@ -72,6 +110,16 @@ export function A11yTask() {
               className="flex-1 w-full bg-transparent p-6 font-mono text-sm text-zinc-300 focus:outline-none resize-none leading-relaxed"
               spellCheck={false}
             />
+            {errors.length > 0 && (
+              <div className="bg-red-500/10 border-t border-red-500/20 p-4">
+                {errors.map((err, i) => (
+                  <div key={i} className="text-xs text-red-400 flex items-center gap-2">
+                    <span className="h-1 w-1 rounded-full bg-red-400" />
+                    {err}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Robot View Area */}
@@ -146,12 +194,22 @@ export function A11yTask() {
                     <ShieldCheck size={32} />
                   </motion.div>
                   <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Acessibilidade 10/10!</h2>
-                  <button 
-                    onClick={() => window.location.href = "/"}
-                    className="mt-6 rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
-                  >
-                    Voltar ao Dashboard
-                  </button>
+                  
+                  <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button 
+                      onClick={handleReset}
+                      className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-6 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
+                    >
+                      <RotateCcw size={16} />
+                      Repetir
+                    </button>
+                    <button 
+                      onClick={() => window.location.href = "/"}
+                      className="rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
+                    >
+                      Voltar ao Dashboard
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}

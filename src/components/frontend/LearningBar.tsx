@@ -9,6 +9,7 @@ interface LearningBarProps {
   isComplete: boolean;
   onNext: () => void;
   showNext: boolean;
+  onLearnMore?: () => void;
 }
 
 export function LearningBar({ 
@@ -18,7 +19,8 @@ export function LearningBar({
   targetSnippet, 
   isComplete, 
   onNext,
-  showNext 
+  showNext,
+  onLearnMore
 }: LearningBarProps) {
   return (
     <div className="border-t border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
@@ -56,6 +58,14 @@ export function LearningBar({
               <p className="text-[11px] italic text-zinc-500 dark:text-zinc-400 leading-relaxed">
                 &quot;{explanation}&quot;
               </p>
+              {onLearnMore && (
+                <button 
+                  onClick={onLearnMore}
+                  className="text-[10px] text-blue-500 hover:underline font-medium"
+                >
+                  Saiba mais sobre isso
+                </button>
+              )}
             </div>
 
             {showNext && isComplete && (
