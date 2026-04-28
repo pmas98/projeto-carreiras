@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, ArrowRight, Wand2 } from "lucide-react";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useProgressStore } from "@/store/useProgressStore";
 import { ROLE_META, TASKS_BY_ROLE, type CareerRole, type TaskId } from "@/lib/tasks";
 
@@ -23,14 +26,70 @@ const TASK_ICONS: Partial<Record<TaskId, string>> = {
   frontend_a11y: "♿",
 };
 
+const TUTORIAL_TARGETS_BY_TASK: Partial<
+  Record<TaskId, { primary: string; secondary: string }>
+> = {
+  devops_outage: {
+    primary: "devops-alert-card",
+    secondary: "devops-ack-button",
+  },
+  devops_terminal: {
+    primary: "devops-terminal-input",
+    secondary: "devops-terminal-run",
+  },
+  devops_investigation_resolution: {
+    primary: "devops-logs-panel",
+    secondary: "devops-resolution-actions",
+  },
+  backend_api_client: {
+    primary: "backend-api-request-builder",
+    secondary: "backend-api-send",
+  },
+  backend_auth: {
+    primary: "backend-auth-payload",
+    secondary: "backend-auth-token",
+  },
+  backend_data_fetching: {
+    primary: "backend-fetch-auth-header",
+    secondary: "backend-fetch-filters",
+  },
+};
+
 export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
   const completedTaskIds = useProgressStore((s) => s.completedTasks);
   const markTaskComplete = useProgressStore((s) => s.markTaskComplete);
-  const doneSet = new Set(completedTaskIds);
+  const markTutorialSeen = useProgressStore((s) => s.markTutorialSeen);
+  const doneSet = useMemo(() => new Set(completedTaskIds), [completedTaskIds]);
 
   const meta = ROLE_META[role];
   const tasks = TASKS_BY_ROLE[role];
   const doneCount = tasks.filter((t) => doneSet.has(t.id)).length;
+  const shouldUseCardTutorials = role === "devOps" || role === "backend";
+
+  const defaultSelectedTaskId = useMemo(() => {
+    if (!shouldUseCardTutorials || tasks.length === 0) return "";
+    const firstPending = tasks.find((task) => !doneSet.has(task.id));
+    return (firstPending ?? tasks[0]).id;
+  }, [doneSet, shouldUseCardTutorials, tasks]);
+
+  const [selectedTaskId, setSelectedTaskId] = useState<TaskId | "">("");
+  const [pendingReplayTaskId, setPendingReplayTaskId] = useState<TaskId | "">("");
+  const activeTaskId = shouldUseCardTutorials
+    ? selectedTaskId || defaultSelectedTaskId
+    : "";
+  // DevOps/Backend tutorials stay panel-level until dedicated task pages are available.
+  const tutorial = useGuidedTutorial(activeTaskId);
+
+  useEffect(() => {
+    if (!pendingReplayTaskId || activeTaskId !== pendingReplayTaskId) return;
+    const replayTimeoutId = window.setTimeout(() => {
+      tutorial.start();
+      setPendingReplayTaskId("");
+    }, 0);
+    return () => {
+      window.clearTimeout(replayTimeoutId);
+    };
+  }, [activeTaskId, pendingReplayTaskId, tutorial]);
 
   return (
     <div className="w-full">
@@ -70,11 +129,19 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
           return (
             <div
               key={t.id}
+              data-tutorial={
+                shouldUseCardTutorials ? TUTORIAL_TARGETS_BY_TASK[t.id]?.primary : undefined
+              }
+              onClick={() => {
+                if (shouldUseCardTutorials) {
+                  setSelectedTaskId(t.id);
+                }
+              }}
               className={`rounded-2xl border p-4 transition-colors ${
                 done
                   ? "border-emerald-200 bg-emerald-50 dark:border-emerald-800/70 dark:bg-emerald-950/40"
                   : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
-              }`}
+              } ${shouldUseCardTutorials ? "cursor-pointer" : ""}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
@@ -136,6 +203,39 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
                         Marcar como concluído (demo)
                       </button>
                     ) : null}
+                    {shouldUseCardTutorials ? (
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          data-tutorial={TUTORIAL_TARGETS_BY_TASK[t.id]?.secondary}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            if (activeTaskId === t.id) {
+                              tutorial.start();
+                              return;
+                            }
+                            setPendingReplayTaskId(t.id);
+                            setSelectedTaskId(t.id);
+                          }}
+                          className="inline-flex items-center gap-2 self-start rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-800 transition hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
+                        >
+                          Mostrar tutorial
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            markTutorialSeen(t.id);
+                            if (activeTaskId === t.id) {
+                              tutorial.close();
+                            }
+                          }}
+                          className="inline-flex items-center gap-2 self-start rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                        >
+                          Pular tutorial
+                        </button>
+                      </div>
+                    ) : null}
                   </>
                 )}
               </div>
@@ -154,6 +254,7 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
             : "Você receberá dicas específicas da função enquanto trabalha em cada tarefa. Por enquanto, esta página é uma estrutura de roteamento e progresso."}
         </p>
       </div>
+      {shouldUseCardTutorials ? <GuidedTutorialOverlay tutorial={tutorial} /> : null}
     </div>
   );
 }

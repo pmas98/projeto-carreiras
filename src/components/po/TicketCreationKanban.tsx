@@ -12,6 +12,8 @@ import {
   Expand,
   Minimize2,
 } from "lucide-react";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useProgressStore } from "@/store/useProgressStore";
 import { INITIAL_TICKETS, type KanbanCard, type KanbanColumn } from "@/lib/po-tickets";
 
@@ -205,6 +207,7 @@ function KanbanCardView({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function TicketCreationKanban() {
+  const tutorial = useGuidedTutorial("po_ticket_creation");
   const markTaskComplete = useProgressStore((s) => s.markTaskComplete);
   const setPoTicketState = useProgressStore((s) => s.setPoTicketState);
   const storedTickets = useProgressStore((s) => s.poTicketState);
@@ -262,6 +265,13 @@ export function TicketCreationKanban() {
           <h1 className="text-sm font-semibold text-white">
             🗂️ Tarefa 3 — Criação de Tickets
           </h1>
+          <button
+            type="button"
+            onClick={tutorial.start}
+            className="rounded-full border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 transition hover:bg-white/10"
+          >
+            Mostrar tutorial
+          </button>
 
           {/* Progress bar */}
           <div className="ml-4 flex items-center gap-3">
@@ -288,7 +298,10 @@ export function TicketCreationKanban() {
 
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* Mentor tip panel */}
-        <div className="mb-6 flex items-start gap-3 rounded-2xl bg-amber-500/10 px-5 py-4 ring-1 ring-amber-500/20">
+        <div
+          data-tutorial="po-ticket-new"
+          className="mb-6 flex items-start gap-3 rounded-2xl bg-amber-500/10 px-5 py-4 ring-1 ring-amber-500/20"
+        >
           <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
           <div>
             <p className="text-sm font-semibold text-amber-300">
@@ -303,7 +316,7 @@ export function TicketCreationKanban() {
         </div>
 
         {/* Kanban board */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div data-tutorial="po-ticket-editor" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {COLUMNS.map((colDef) => {
             const colCards = cards.filter((c) => c.column === colDef.id);
             return (
@@ -408,6 +421,7 @@ export function TicketCreationKanban() {
           )}
         </AnimatePresence>
       </div>
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </div>
   );
 }

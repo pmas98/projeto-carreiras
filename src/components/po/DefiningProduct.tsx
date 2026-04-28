@@ -11,6 +11,8 @@ import {
   User,
   Building2,
 } from "lucide-react";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useProgressStore } from "@/store/useProgressStore";
 import {
   PERSONAS,
@@ -172,6 +174,7 @@ function RequirementRow({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function DefiningProduct() {
+  const tutorial = useGuidedTutorial("po_defining_product");
   const markTaskComplete = useProgressStore((s) => s.markTaskComplete);
   const setPoRequirementDraft = useProgressStore((s) => s.setPoRequirementDraft);
   const existingDraft = useProgressStore((s) => s.poRequirementDraft);
@@ -274,8 +277,15 @@ export function DefiningProduct() {
           <h1 className="text-sm font-semibold text-white">
             📌 Tarefa 2 — Definindo o Produto
           </h1>
+          <button
+            type="button"
+            onClick={tutorial.start}
+            className="ml-auto rounded-full border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 transition hover:bg-white/10"
+          >
+            Mostrar tutorial
+          </button>
           {(taskCompleted || isAlreadyDone) && (
-            <span className="ml-auto flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/40">
+            <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/40">
               <CheckCircle2 className="h-3.5 w-3.5" />
               Concluído
             </span>
@@ -295,7 +305,7 @@ export function DefiningProduct() {
           {/* ── Left panel: selection ── */}
           <div className="space-y-6">
             {/* Personas */}
-            <div>
+            <div data-tutorial="po-personas-panel">
               <div className="mb-3 flex items-center gap-2">
                 <User className="h-4 w-4 text-slate-400" />
                 <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">
@@ -409,6 +419,7 @@ export function DefiningProduct() {
             <AnimatePresence>
               {isExtracted && (
                 <motion.div
+                  data-tutorial="po-requirements-list"
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-4"
@@ -467,6 +478,7 @@ export function DefiningProduct() {
           </div>
         </div>
       </div>
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </div>
   );
 }

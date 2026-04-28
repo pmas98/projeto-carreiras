@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { TaskShell } from "../TaskShell";
 import { LearningBar } from "../LearningBar";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useTutorialProgress, TutorialStep } from "@/hooks/useTutorialProgress";
 import { motion } from "framer-motion";
 import { Accessibility, ShieldCheck } from "lucide-react";
@@ -39,6 +41,7 @@ const A11Y_STEPS: TutorialStep[] = [
 
 export function A11yTask() {
   const [code, setCode] = useState('<div onClick={closeModal}>\n  <img src="close.png" />\n</div>\n\n<div className="text-gray-200 bg-gray-100">\n  Texto ilegível\n</div>');
+  const tutorial = useGuidedTutorial("frontend_a11y");
   
   const { 
     currentStep, 
@@ -53,6 +56,7 @@ export function A11yTask() {
     <TaskShell 
       title="O Pesadelo do Leitor de Tela" 
       subtitle="Corrija a semântica e a acessibilidade deste dashboard."
+      onReplayTutorial={tutorial.start}
     >
       <div className="flex flex-1 flex-col h-full overflow-hidden">
         <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
@@ -61,7 +65,8 @@ export function A11yTask() {
             <div className="flex items-center justify-between px-4 py-2 bg-zinc-900 border-b border-zinc-800">
               <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Editor de HTML</span>
             </div>
-            <textarea 
+            <textarea
+              data-tutorial="frontend-a11y-editor"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               className="flex-1 w-full bg-transparent p-6 font-mono text-sm text-zinc-300 focus:outline-none resize-none leading-relaxed"
@@ -100,7 +105,10 @@ export function A11yTask() {
               {/* Accessibility Tree View */}
               <div className="space-y-4">
                 <span className="text-[10px] font-bold text-zinc-400 uppercase">O que o Robô ouve</span>
-                <div className="bg-zinc-900 p-6 rounded-2xl shadow-xl border border-zinc-800 font-mono text-xs text-green-500 min-h-[300px] space-y-4">
+                <div
+                  data-tutorial="frontend-a11y-tree"
+                  className="bg-zinc-900 p-6 rounded-2xl shadow-xl border border-zinc-800 font-mono text-xs text-green-500 min-h-[300px] space-y-4"
+                >
                   <div>&gt; Carregando página...</div>
                   <div className="text-zinc-500 italic">Árvore de Acessibilidade:</div>
                   <div className="pl-4 space-y-3">
@@ -163,6 +171,7 @@ export function A11yTask() {
           />
         )}
       </div>
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </TaskShell>
   );
 }

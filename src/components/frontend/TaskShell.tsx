@@ -9,9 +9,16 @@ interface TaskShellProps {
   subtitle: string;
   children: React.ReactNode;
   onHelpClick?: () => void;
+  onReplayTutorial?: () => void;
 }
 
-export function TaskShell({ title, subtitle, children, onHelpClick }: TaskShellProps) {
+export function TaskShell({
+  title,
+  subtitle,
+  children,
+  onHelpClick,
+  onReplayTutorial,
+}: TaskShellProps) {
   return (
     <div className="flex flex-1 flex-col bg-zinc-50 dark:bg-black min-h-screen">
       {/* Top Bar */}
@@ -19,6 +26,7 @@ export function TaskShell({ title, subtitle, children, onHelpClick }: TaskShellP
         <div className="flex items-center gap-4">
           <Link
             href="/frontend"
+            aria-label="Voltar para os módulos de frontend"
             className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -30,13 +38,23 @@ export function TaskShell({ title, subtitle, children, onHelpClick }: TaskShellP
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={onHelpClick}
-            className="flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
-          >
-            <HelpCircle className="h-3.5 w-3.5" />
-            Ajuda
-          </button>
+          {onReplayTutorial ? (
+            <button
+              onClick={onReplayTutorial}
+              className="flex h-8 items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            >
+              Mostrar tutorial
+            </button>
+          ) : null}
+          {onHelpClick ? (
+            <button
+              onClick={onHelpClick}
+              className="flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            >
+              <HelpCircle className="h-3.5 w-3.5" />
+              Ajuda
+            </button>
+          ) : null}
         </div>
       </header>
 
