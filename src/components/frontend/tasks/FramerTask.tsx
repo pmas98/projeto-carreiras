@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { TaskShell } from "../TaskShell";
 import { LearningBar } from "../LearningBar";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useTutorialProgress, TutorialStep } from "@/hooks/useTutorialProgress";
 import { motion } from "framer-motion";
 import { Sparkles, Play } from "lucide-react";
@@ -39,13 +41,13 @@ const FRAMER_STEPS: TutorialStep[] = [
 
 export function FramerTask() {
   const [code, setCode] = useState('<motion.div\n  animate={{ opacity: 1 }}\n  transition={{ }}\n>\n  <motion.button \n    whileHover={{ }}\n  >\n    Enviar\n  </motion.button>\n</motion.div>');
+  const tutorial = useGuidedTutorial("frontend_framer");
   
   const { 
     currentStep, 
     isStepComplete, 
     isLastStep, 
-    goToNextStep,
-    progress 
+    goToNextStep
   } = useTutorialProgress(FRAMER_STEPS, code);
 
   const isTaskComplete = isLastStep && isStepComplete;
@@ -54,6 +56,7 @@ export function FramerTask() {
     <TaskShell 
       title="Micro-interações" 
       subtitle="Transforme o formulário estático em uma experiência premium."
+      onReplayTutorial={tutorial.start}
     >
       <div className="flex flex-1 flex-col h-full overflow-hidden">
         <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
@@ -67,7 +70,8 @@ export function FramerTask() {
                 <div className="h-2 w-2 rounded-full bg-green-500" />
               </div>
             </div>
-            <textarea 
+            <textarea
+              data-tutorial="frontend-framer-editor"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               className="flex-1 w-full bg-transparent p-6 font-mono text-sm text-zinc-300 focus:outline-none resize-none leading-relaxed"
@@ -76,7 +80,10 @@ export function FramerTask() {
           </div>
 
           {/* Preview Area */}
-          <div className="flex-1 bg-zinc-50 p-8 dark:bg-black flex items-center justify-center relative">
+          <div
+            data-tutorial="frontend-framer-preview"
+            className="flex-1 bg-zinc-50 p-8 dark:bg-black flex items-center justify-center relative"
+          >
             <div className="w-full max-w-md">
               <motion.div 
                 layout
@@ -161,6 +168,7 @@ export function FramerTask() {
           />
         )}
       </div>
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </TaskShell>
   );
 }

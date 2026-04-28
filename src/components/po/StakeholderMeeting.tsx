@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, AlertTriangle, XCircle, Lightbulb, ChevronRight, Sparkles } from "lucide-react";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useProgressStore } from "@/store/useProgressStore";
 import {
   DIALOGUE_TREE,
@@ -337,6 +339,7 @@ function EndScreen({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function StakeholderMeeting() {
+  const tutorial = useGuidedTutorial("po_stakeholder_meeting");
   const markTaskComplete = useProgressStore((s) => s.markTaskComplete);
   const setPoStakeholderOutcome = useProgressStore((s) => s.setPoStakeholderOutcome);
   const isAlreadyDone = useProgressStore((s) =>
@@ -454,6 +457,13 @@ export function StakeholderMeeting() {
             🤝 Tarefa 1 — A Reunião com Stakeholder
           </h1>
           <div className="ml-auto">
+            <button
+              type="button"
+              onClick={tutorial.start}
+              className="mr-2 rounded-full border border-white/15 px-3 py-1 text-xs font-medium text-slate-200 transition hover:bg-white/10"
+            >
+              Mostrar tutorial
+            </button>
             {(taskCompleted || isAlreadyDone) && (
               <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/40">
                 <CheckCircle2 className="h-3.5 w-3.5" />
@@ -470,7 +480,7 @@ export function StakeholderMeeting() {
       </header>
 
       {/* ── Chat area ── */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div data-tutorial="po-meeting-context" className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl space-y-4 px-4 py-6">
           <AnimatePresence initial={false}>
             {messages.map((msg, i) => (
@@ -518,13 +528,14 @@ export function StakeholderMeeting() {
                 alreadyDone={taskCompleted || isAlreadyDone}
               />
             ) : !isComplete && currentChoices ? (
-              <motion.div key="choices">
+              <motion.div key="choices" data-tutorial="po-meeting-options">
                 <ChoicePanel choices={currentChoices} onChoice={handleChoice} />
               </motion.div>
             ) : null}
           </AnimatePresence>
         </div>
       </div>
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </div>
   );
 }

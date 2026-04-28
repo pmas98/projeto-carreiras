@@ -54,7 +54,7 @@ export function LearningBar({
                 <span className="text-[10px] font-medium text-zinc-400 uppercase">Por que?</span>
               </div>
               <p className="text-[11px] italic text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                "{explanation}"
+                &quot;{explanation}&quot;
               </p>
             </div>
 

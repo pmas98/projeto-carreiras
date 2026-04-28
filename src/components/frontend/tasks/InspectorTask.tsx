@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { TaskShell } from "../TaskShell";
 import { EducationalTooltip } from "../EducationalTooltip";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useTaskValidation } from "@/hooks/useTaskValidation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
@@ -29,6 +31,7 @@ export function InspectorTask() {
   const [showMockup, setShowMockup] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<{title: string, content: string, hint?: string} | null>(null);
+  const tutorial = useGuidedTutorial("frontend_inspector");
 
   const { isComplete } = useTaskValidation({
     taskId: "frontend_inspector",
@@ -80,10 +83,14 @@ export function InspectorTask() {
       title="Inspetor de Design" 
       subtitle="Ajuste os valores para alinhar o componente ao mockup."
       onHelpClick={() => setHelpOpen(true)}
+      onReplayTutorial={tutorial.start}
     >
       <div className="flex flex-1 flex-col lg:flex-row h-full overflow-hidden">
         {/* Controls Sidebar */}
-        <div className="w-full lg:w-80 border-r border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950 overflow-y-auto">
+        <div
+          data-tutorial="frontend-inspector-controls"
+          className="w-full lg:w-80 border-r border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950 overflow-y-auto"
+        >
           <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 mb-6 uppercase tracking-wider">Propriedades CSS</h3>
           
           <div className="space-y-8">
@@ -211,6 +218,7 @@ export function InspectorTask() {
           <div className="mt-12 pt-6 border-t border-zinc-100 dark:border-zinc-900">
             <button
               onClick={() => setShowMockup(!showMockup)}
+              data-tutorial="frontend-inspector-mockup-toggle"
               className={`flex w-full items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${
                 showMockup 
                 ? "bg-zinc-900 text-white border-zinc-900 dark:bg-zinc-50 dark:text-black dark:border-zinc-50" 
@@ -312,6 +320,7 @@ export function InspectorTask() {
         content="Use o botão 'Mostrar Mockup' para ver o design original por baixo do seu. O objetivo é fazer com que as formas azuis (mockup) e as formas escuras (seu componente) se encaixem perfeitamente."
         hint="Tente ajustar o Padding primeiro, depois o Gap e por último o Border Radius."
       />
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </TaskShell>
   );
 }
