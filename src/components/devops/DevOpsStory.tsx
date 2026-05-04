@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, CheckCircle2, Info, ArrowRight, ShieldAlert } from "lucide-react";
 import { TelemetryGraph } from "./TelemetryGraph";
 import { GuidedTerminal } from "./GuidedTerminal";
+import { GlossaryTooltip } from "./GlossaryTooltip";
 import { useProgressStore } from "@/store/useProgressStore";
 
 type StoryStage = 'calm' | 'alert' | 'investigating' | 'resolved';
@@ -137,7 +138,7 @@ export function DevOpsStory() {
               </div>
               <p className="text-xs opacity-90 leading-relaxed">
                 O site parou de responder! Os usuários não conseguem acessar a plataforma. 
-                Use o terminal abaixo para investigar a causa.
+                Use o <GlossaryTooltip term="Terminal" definition="Uma forma de falar diretamente com o computador usando comandos de texto.">terminal</GlossaryTooltip> abaixo para investigar a causa.
               </p>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
                 <ArrowRight size={12} />
@@ -158,7 +159,8 @@ export function DevOpsStory() {
                 DIAGNÓSTICO: DISCO_CHEIO
               </div>
               <p className="text-xs opacity-90 leading-relaxed">
-                O servidor ficou sem espaço! Quando o disco enche, o sistema não consegue mais salvar logs nem processar requisições. 
+                O <GlossaryTooltip term="Servidor" definition="Um computador potente que 'serve' seu site para o mundo.">servidor</GlossaryTooltip> ficou sem espaço! 
+                Quando o disco enche, o sistema não consegue mais salvar <GlossaryTooltip term="Logs" definition="O 'diário' do sistema, onde ele registra tudo o que acontece.">logs</GlossaryTooltip> nem processar requisições. 
               </p>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
                 <ArrowRight size={12} />
@@ -181,7 +183,7 @@ export function DevOpsStory() {
               <div className="space-y-3">
                 <p className="text-xs opacity-90 leading-relaxed">
                   Excelente trabalho! Você identificou e resolveu o problema em tempo recorde. 
-                  Isso é o que um engenheiro DevOps faz: mantém a infraestrutura saudável e automatiza soluções.
+                  Isso é o que um engenheiro <GlossaryTooltip term="DevOps" definition="A ponte entre criar o software e garantir que ele funcione bem para todos.">DevOps</GlossaryTooltip> faz: mantém a infraestrutura saudável e automatiza soluções.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
                   <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-[9px] font-bold border border-emerald-500/30">LOG_ROTATION_LEARNED</span>
