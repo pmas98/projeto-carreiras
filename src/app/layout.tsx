@@ -29,8 +29,13 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black dark:text-zinc-50">
-        <ProgressHydrator>{children}</ProgressHydrator>
+      <body className="min-h-full flex flex-col bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-black dark:text-zinc-50">
+        <div className="relative flex min-h-screen flex-col">
+          <div className="fixed inset-0 bg-dot-grid pointer-events-none" />
+          <div className="relative flex flex-1 flex-col">
+            <ProgressHydrator>{children}</ProgressHydrator>
+          </div>
+        </div>
       </body>
     </html>
   );

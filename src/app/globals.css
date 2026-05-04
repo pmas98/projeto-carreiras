@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --dot-color: rgba(39, 39, 42, 0.2);
 }
 
 @theme inline {
@@ -16,7 +17,31 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --dot-color: rgba(39, 39, 42, 0.4);
   }
+}
+
+.bg-dot-grid {
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@keyframes scan {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+.animate-scan {
+  animation: scan 3s linear infinite;
+}
+
+@keyframes pulse-led {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.9); }
+}
+
+.animate-pulse-led {
+  animation: pulse-led 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 body {
