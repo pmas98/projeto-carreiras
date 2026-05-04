@@ -69,8 +69,8 @@ export default function Dashboard() {
           </div>
         </header>
 
-        <section className="mt-8">
-          <div className="grid gap-4 sm:grid-cols-2">
+        <section className="mt-12">
+          <div className="grid gap-6 md:grid-cols-2 lg:gap-8">
             {(
               Object.keys(ROLE_META) as Array<keyof typeof ROLE_META>
             ).map((role) => {
@@ -90,9 +90,16 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <footer className="mt-8 text-xs text-zinc-500 dark:text-zinc-400">
-          As Fases 1 + 2 estão conectadas: estrutura de roteamento + Zustand + persistência no localStorage. 
-          As tarefas das funções serão implementadas em breve.
+        <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-zinc-200 py-8 font-mono text-[10px] text-zinc-500 dark:border-zinc-800 md:flex-row">
+          <div className="flex items-center gap-4">
+            <span>SYSTEM_ID: 0x9f2a4b</span>
+            <span className="h-3 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
+            <span>ENCRYPTION: AES_256_ACTIVE</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald-500/50" />
+            <span>LOCAL_STORAGE_PERSISTENCE: CONNECTED</span>
+          </div>
         </footer>
       </div>
     </div>
