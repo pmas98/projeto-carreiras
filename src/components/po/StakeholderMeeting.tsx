@@ -377,9 +377,10 @@ export function StakeholderMeeting() {
         return [
           ...prev,
           {
+            id: `${currentNodeId}-${Date.now()}`,
             nodeId: currentNodeId,
             speaker: "stakeholder",
-            text: node.stakeholderText,
+            text: node.text,
           },
         ];
       });

@@ -88,7 +88,7 @@ export function FramerTask() {
   const isSpring = code.includes("type: 'spring'") || code.includes('type: "spring"');
 
   const hoverProps = code.includes("whileHover") ? { scale: hoverScale } : {};
-  const transitionProps = isSpring ? { type: "spring", stiffness: 400, damping: 10 } : {};
+  const transitionProps = isSpring ? { type: "spring" as const, stiffness: 400, damping: 10 } : {};
   
   // Basic Syntax checking
   const errors = [];
