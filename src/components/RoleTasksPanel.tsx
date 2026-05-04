@@ -15,6 +15,9 @@ const TASK_ROUTES: Partial<Record<TaskId, string>> = {
   frontend_inspector: "/frontend/frontend_inspector",
   frontend_framer: "/frontend/frontend_framer",
   frontend_a11y: "/frontend/frontend_a11y",
+  devops_incident_response: "/devops/devops_incident_response",
+  devops_deployment_pipeline: "/devops/devops_deployment_pipeline",
+  devops_infrastructure_scaling: "/devops/devops_infrastructure_scaling",
 };
 
 const TASK_ICONS: Partial<Record<TaskId, string>> = {
@@ -24,22 +27,17 @@ const TASK_ICONS: Partial<Record<TaskId, string>> = {
   frontend_inspector: "🔍",
   frontend_framer: "✨",
   frontend_a11y: "♿",
+  devops_incident_response: "🚨",
+  devops_deployment_pipeline: "🚀",
+  devops_infrastructure_scaling: "🏗️",
 };
 
 const TUTORIAL_TARGETS_BY_TASK: Partial<
   Record<TaskId, { primary: string; secondary: string }>
 > = {
-  devops_outage: {
-    primary: "devops-alert-card",
-    secondary: "devops-ack-button",
-  },
-  devops_terminal: {
-    primary: "devops-terminal-input",
-    secondary: "devops-terminal-run",
-  },
-  devops_investigation_resolution: {
-    primary: "devops-logs-panel",
-    secondary: "devops-resolution-actions",
+  devops_incident_response: {
+    primary: "devops-incident-monitor",
+    secondary: "devops-incident-resolve",
   },
   backend_api_client: {
     primary: "backend-api-request-builder",
@@ -64,7 +62,7 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
   const meta = ROLE_META[role];
   const tasks = TASKS_BY_ROLE[role];
   const doneCount = tasks.filter((t) => doneSet.has(t.id)).length;
-  const shouldUseCardTutorials = role === "devOps" || role === "backend";
+  const shouldUseCardTutorials = role === "backend";
 
   const defaultSelectedTaskId = useMemo(() => {
     if (!shouldUseCardTutorials || tasks.length === 0) return "";
@@ -249,8 +247,8 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
           Mentor
         </div>
         <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
-          {role === "productOwner" || role === "frontend"
-            ? `Cada tarefa de ${meta.label} é uma simulação totalmente interativa. No Frontend, você ajustará layouts, animações e acessibilidade com feedback em tempo real.`
+          {role === "productOwner" || role === "frontend" || role === "devOps"
+            ? `Cada tarefa de ${meta.label} é uma simulação totalmente interativa. Você enfrentará desafios reais do dia a dia, com feedback imediato.`
             : "Você receberá dicas específicas da função enquanto trabalha em cada tarefa. Por enquanto, esta página é uma estrutura de roteamento e progresso."}
         </p>
       </div>

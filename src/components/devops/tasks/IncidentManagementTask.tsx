@@ -1,15 +1,16 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, CheckCircle2, Info, ArrowRight, ShieldAlert } from "lucide-react";
-import { TelemetryGraph } from "./TelemetryGraph";
-import { GuidedTerminal } from "./GuidedTerminal";
-import { GlossaryTooltip } from "./GlossaryTooltip";
+import { AlertTriangle, CheckCircle2, Info, ArrowRight, ShieldAlert, Activity, Terminal as TerminalIcon } from "lucide-react";
+import { TelemetryGraph } from "../TelemetryGraph";
+import { GuidedTerminal } from "../GuidedTerminal";
+import { GlossaryTooltip } from "../GlossaryTooltip";
 import { useProgressStore } from "@/store/useProgressStore";
+import { useRouter } from "next/navigation";
 
 type StoryStage = 'calm' | 'alert' | 'investigating' | 'resolved';
 
-export function DevOpsStory() {
+export function IncidentManagementTask() {
   const [stage, setStage] = useState<StoryStage>('calm');
   const [health, setHealth] = useState(100);
   const [logs, setLogs] = useState<string[]>([
@@ -17,7 +18,8 @@ export function DevOpsStory() {
     "[SYSTEM] Monitoring Node_04... Status: OK.",
   ]);
   
-  const completeTask = useProgressStore(s => s.completeTask);
+  const markTaskComplete = useProgressStore(s => s.markTaskComplete);
+  const router = useRouter();
 
   // Initial calm state leads to alert
   useEffect(() => {
@@ -33,7 +35,6 @@ export function DevOpsStory() {
           "[ALERT] HTTP_503 service unavailable",
           " "
         ]);
-        // Simulate pager notification sound/vibration feeling
         if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
       }, 4000);
       return () => clearTimeout(timer);
@@ -82,12 +83,10 @@ export function DevOpsStory() {
           "Restarting services..."
         ]);
         
-        // Short delay for "restart" feel
         setTimeout(() => {
           setHealth(100);
           setStage('resolved');
           setLogs(prev => [...prev, "[SYSTEM] All services operational.", "Node_04 status: HEALTHY."]);
-          completeTask("devops_investigation_resolution");
         }, 1500);
       } else {
         setLogs(prev => [...prev, "> purge-logs", "Error: Storage is already healthy."]);
@@ -95,18 +94,31 @@ export function DevOpsStory() {
       return;
     }
 
-    // Default for unknown commands
-    setLogs(prev => [...prev, `> ${cmd}`, `Command '${cmd}' not recognized. Type 'help' for options.`]);
-  }, [stage, completeTask]);
+    setLogs(prev => [...prev, `> ${cmd}`, `Command '${cmd}' not recognized.`]);
+  }, [stage]);
+
+  const handleFinish = () => {
+    markTaskComplete("devops_incident_response");
+    router.push("/devops");
+  };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
-      {/* Top Section: Health Monitor */}
-      <section>
+    <div className="mx-auto max-w-4xl space-y-8 p-6">
+      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Tarefa 1: Gestão de Incidentes</h1>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">Resolva um incidente crítico de produção.</p>
+        </div>
+        <div className="flex items-center gap-4 text-[10px] font-mono text-zinc-400">
+           <span className="flex items-center gap-1"><TerminalIcon size={12} /> SESSION_ACTIVE</span>
+           <span className="flex items-center gap-1 text-emerald-500"><Activity size={12} /> LIVE_TELEMETRY</span>
+        </div>
+      </div>
+
+      <section data-tutorial="devops-incident-monitor">
         <TelemetryGraph health={health} />
       </section>
 
-      {/* Middle Section: Alerts & Instructions */}
       <section className="relative min-h-[100px]">
         <AnimatePresence mode="wait">
           {stage === 'calm' && (
@@ -180,32 +192,31 @@ export function DevOpsStory() {
                 <CheckCircle2 size={24} />
                 INCIDENTE_RESOLVIDO
               </div>
-              <div className="space-y-3">
-                <p className="text-xs opacity-90 leading-relaxed">
-                  Excelente trabalho! Você identificou e resolveu o problema em tempo recorde. 
-                  Isso é o que um engenheiro <GlossaryTooltip term="DevOps" definition="A ponte entre criar o software e garantir que ele funcione bem para todos.">DevOps</GlossaryTooltip> faz: mantém a infraestrutura saudável e automatiza soluções.
-                </p>
-                <div className="flex flex-wrap gap-2 pt-2">
-                  <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-[9px] font-bold border border-emerald-500/30">LOG_ROTATION_LEARNED</span>
-                  <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-[9px] font-bold border border-emerald-500/30">TRIAGE_MASTER</span>
-                </div>
-              </div>
+              <p className="text-xs opacity-90 leading-relaxed">
+                Excelente trabalho! Você identificou e resolveu o problema em tempo recorde. 
+                Isso é o que um engenheiro <GlossaryTooltip term="DevOps" definition="A ponte entre criar o software e garantir que ele funcione bem para todos.">DevOps</GlossaryTooltip> faz: mantém a infraestrutura saudável e automatiza soluções.
+              </p>
+              <button
+                onClick={handleFinish}
+                className="flex items-center justify-center gap-2 self-start rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-emerald-700"
+              >
+                Concluir Tarefa
+                <ArrowRight size={18} />
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
       </section>
 
-      {/* Bottom Section: Terminal */}
-      <section>
+      <section data-tutorial="devops-incident-resolve">
         <GuidedTerminal onCommand={handleCommand} output={logs} />
       </section>
 
-      {/* Contextual Glossary (Educational) */}
-      <footer className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 opacity-60 hover:opacity-100 transition-opacity">
+      <footer className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 opacity-60">
         <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
           <h4 className="text-[10px] font-bold font-mono uppercase tracking-widest text-zinc-500 mb-2">Conceito: Servidor</h4>
           <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            É como um computador potente que "serve" o seu site para o mundo. Se o disco dele enche, ele para de funcionar, igual ao seu celular.
+            É como um computador potente que "serve" o seu site para o mundo. Se o disco dele enche, ele para de funcionar.
           </p>
         </div>
         <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">

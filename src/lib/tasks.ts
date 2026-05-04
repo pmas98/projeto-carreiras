@@ -4,9 +4,9 @@ export type TaskId =
   | "po_stakeholder_meeting"
   | "po_defining_product"
   | "po_ticket_creation"
-  | "devops_outage"
-  | "devops_terminal"
-  | "devops_investigation_resolution"
+  | "devops_incident_response"
+  | "devops_deployment_pipeline"
+  | "devops_infrastructure_scaling"
   | "frontend_inspector"
   | "frontend_framer"
   | "frontend_a11y"
@@ -40,19 +40,19 @@ export const TASKS_BY_ROLE: Record<CareerRole, TaskDef[]> = {
   ],
   devOps: [
     {
-      id: "devops_outage",
-      title: "A Interrupção",
-      subtitle: "Receba um alerta simulado no estilo PagerDuty.",
+      id: "devops_incident_response",
+      title: "Gestão de Incidentes",
+      subtitle: "Monitore a saúde do sistema e resolva quedas em tempo real.",
     },
     {
-      id: "devops_terminal",
-      title: "O Terminal",
-      subtitle: "Use uma CLI de navegador com comandos básicos como `ls` e `cat`.",
+      id: "devops_deployment_pipeline",
+      title: "Pipeline de Deploy",
+      subtitle: "Configure automações para levar o código da máquina do dev até a produção.",
     },
     {
-      id: "devops_investigation_resolution",
-      title: "Investigação e Resolução",
-      subtitle: "Execute os comandos certos para consertar a máquina.",
+      id: "devops_infrastructure_scaling",
+      title: "Infraestrutura e Escala",
+      subtitle: "Provisione recursos e garanta que o sistema aguente milhões de acessos.",
     },
   ],
   frontend: [
