@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { TaskShell } from "../TaskShell";
 import { EducationalTooltip } from "../EducationalTooltip";
 import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
@@ -31,7 +32,7 @@ const INITIAL_VALUES = {
 export function InspectorTask() {
   const [values, setValues] = useState(INITIAL_VALUES);
   const resetTask = useProgressStore((s) => s.resetTask);
-  
+  const router = useRouter();
   const [showMockup, setShowMockup] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<{title: string, content: string, hint?: string} | null>(null);
@@ -308,7 +309,7 @@ export function InspectorTask() {
                     Repetir
                   </button>
                   <button 
-                    onClick={() => window.location.href = "/frontend/frontend_framer"}
+                    onClick={() => router.push("/frontend/frontend_framer")}
                     className="rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
                   >
                     Próxima Tarefa

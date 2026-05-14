@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
@@ -13,6 +14,7 @@ import {
   Info,
   Key,
   FileJson,
+  X,
 } from "lucide-react";
 import { TaskShell } from "@/components/frontend/TaskShell";
 import { EducationalTooltip } from "@/components/frontend/EducationalTooltip";
@@ -229,7 +231,9 @@ export function AuthTask() {
   const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [jwtSection, setJwtSection] = useState<"header" | "payload" | null>(null);
+  const [showModal, setShowModal] = useState(true);
   const resetTask = useProgressStore((s) => s.resetTask);
+  const router = useRouter();
 
   const parsedBody = parseBody(body);
   const hasContentType = headers.some(
@@ -244,6 +248,13 @@ export function AuthTask() {
     validate: (s) => s.responseStatus === 200,
   });
 
+  useEffect(() => {
+    if (!isComplete || response) return;
+    const saved = localStorage.getItem("resp_backend_auth");
+    if (!saved) return;
+    try { setResponse(JSON.parse(saved) as ResponseData); } catch {}
+  }, [isComplete, response]);
+
   const handleSend = useCallback(() => {
     if (!url.trim()) return;
     setIsSending(true);
@@ -253,6 +264,9 @@ export function AuthTask() {
     setTimeout(() => {
       const result = getMockResponse(method, url, headers, body);
       setResponse(result);
+      if (result.status === 200) {
+        try { localStorage.setItem("resp_backend_auth", JSON.stringify(result)); } catch {}
+      }
       setIsSending(false);
     }, 700);
   }, [method, url, headers, body]);
@@ -273,6 +287,8 @@ export function AuthTask() {
     setBody(BODY_TEMPLATE);
     setResponse(null);
     setJwtSection(null);
+    setShowModal(true);
+    try { localStorage.removeItem("resp_backend_auth"); } catch {}
     resetTask("backend_auth");
   };
 
@@ -666,39 +682,45 @@ export function AuthTask() {
         </div>
       </div>
 
-      {/* Success overlay */}
+      {/* Fullscreen success overlay */}
       <AnimatePresence>
-        {isComplete && (
+        {isComplete && showModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-40 flex items-center justify-center bg-white/80 dark:bg-black/80 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-8 shadow-2xl text-center max-w-sm w-full mx-4"
+              className="relative rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-8 shadow-2xl text-center max-w-sm w-full mx-4"
             >
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500 text-white">
-                <Key className="h-8 w-8" />
+              <button
+                onClick={() => setShowModal(false)}
+                className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
+                aria-label="Fechar"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500 text-white shadow-lg shadow-amber-500/50">
+                <Key size={32} />
               </div>
               <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">JWT em mãos!</h2>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Você autenticou com sucesso e recebeu o token. Agora pode usá-lo para acessar endpoints protegidos.
-              </p>
+              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Token gerado com sucesso. Guarde-o para a próxima tarefa.</p>
               <div className="mt-6 flex flex-col gap-3">
                 <button
                   onClick={handleReset}
-                  className="flex items-center justify-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-6 py-2.5 text-sm font-medium text-zinc-900 dark:text-zinc-50 transition hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                  className="flex items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white px-6 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
                 >
-                  <RotateCcw className="h-4 w-4" />
-                  Recomeçar
+                  <RotateCcw size={16} />
+                  Repetir
                 </button>
                 <button
-                  onClick={() => (window.location.href = "/backend/backend_data_fetching")}
-                  className="rounded-full bg-zinc-900 dark:bg-zinc-50 px-6 py-2.5 text-sm font-semibold text-white dark:text-black transition hover:bg-zinc-700 dark:hover:bg-zinc-200"
+                  onClick={() => router.push("/backend/backend_data_fetching")}
+                  className="rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
                 >
-                  Próxima Tarefa →
+                  Acessar próxima tarefa →
                 </button>
               </div>
             </motion.div>

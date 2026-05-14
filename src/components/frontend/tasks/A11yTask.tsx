@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { TaskShell } from "../TaskShell";
 import { LearningBar } from "../LearningBar";
 import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
@@ -75,6 +76,7 @@ export function A11yTask() {
   }
 
   const resetTask = useProgressStore((s) => s.resetTask);
+  const router = useRouter();
   const { isComplete: isTaskCompleteStore } = useTaskValidation({
     taskId: "frontend_a11y",
     currentState: code,
@@ -204,7 +206,7 @@ export function A11yTask() {
                       Repetir
                     </button>
                     <button 
-                      onClick={() => window.location.href = "/"}
+                      onClick={() => router.push("/")}
                       className="rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
                     >
                       Voltar ao Dashboard

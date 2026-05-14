@@ -187,7 +187,7 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
                       }`}
                     >
                       <ArrowRight className="h-3.5 w-3.5" />
-                      {done ? "Repetir" : "Iniciar Tarefa"}
+                      {done ? "Acessar" : "Iniciar Tarefa"}
                     </Link>
                   </>
                 ) : (
