@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { TASKS_BY_ROLE } from "@/lib/tasks";
 import { ApiClientTask } from "@/components/backend/tasks/ApiClientTask";
+import { AuthTask } from "@/components/backend/tasks/AuthTask";
 
 interface PageProps {
   params: Promise<{ taskId: string }>;
@@ -17,6 +18,10 @@ export default async function BackendTaskPage({ params }: PageProps) {
 
   if (taskId === "backend_api_client") {
     return <ApiClientTask />;
+  }
+
+  if (taskId === "backend_auth") {
+    return <AuthTask />;
   }
 
   return (
