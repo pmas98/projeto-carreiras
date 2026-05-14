@@ -18,6 +18,9 @@ const TASK_ROUTES: Partial<Record<TaskId, string>> = {
   devops_incident_response: "/devops/devops_incident_response",
   devops_deployment_pipeline: "/devops/devops_deployment_pipeline",
   devops_infrastructure_scaling: "/devops/devops_infrastructure_scaling",
+  backend_api_client: "/backend/backend_api_client",
+  backend_auth: "/backend/backend_auth",
+  backend_data_fetching: "/backend/backend_data_fetching",
 };
 
 const TASK_ICONS: Partial<Record<TaskId, string>> = {
@@ -30,6 +33,9 @@ const TASK_ICONS: Partial<Record<TaskId, string>> = {
   devops_incident_response: "🚨",
   devops_deployment_pipeline: "🚀",
   devops_infrastructure_scaling: "🏗️",
+  backend_api_client: "🔌",
+  backend_auth: "🔑",
+  backend_data_fetching: "📦",
 };
 
 const TUTORIAL_TARGETS_BY_TASK: Partial<

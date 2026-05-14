@@ -10,6 +10,7 @@ interface TaskShellProps {
   children: React.ReactNode;
   onHelpClick?: () => void;
   onReplayTutorial?: () => void;
+  backHref?: string;
 }
 
 export function TaskShell({
@@ -18,6 +19,7 @@ export function TaskShell({
   children,
   onHelpClick,
   onReplayTutorial,
+  backHref = "/frontend",
 }: TaskShellProps) {
   return (
     <div className="flex flex-1 flex-col bg-zinc-50 dark:bg-black min-h-screen">
@@ -25,8 +27,8 @@ export function TaskShell({
       <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-zinc-200 bg-white/80 px-4 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/80">
         <div className="flex items-center gap-4">
           <Link
-            href="/frontend"
-            aria-label="Voltar para os módulos de frontend"
+            href={backHref}
+            aria-label="Voltar"
             className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
           >
             <ChevronLeft className="h-5 w-5" />
