@@ -35,7 +35,7 @@ export function LearningBar({
           >
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-500">Objetivo Atual</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">Objetivo Atual</span>
                 {isComplete && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}><CheckCircle2 size={14} className="text-green-500" /></motion.span>}
               </div>
               <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{stepTitle}</h4>
@@ -44,8 +44,8 @@ export function LearningBar({
 
             <div className="flex-1 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2 mb-1.5">
-                <Code size={12} className="text-zinc-400" />
-                <span className="text-[10px] font-medium text-zinc-400 uppercase">O que escrever</span>
+                <Code size={12} className="text-zinc-500 dark:text-zinc-400" />
+                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase">O que escrever</span>
               </div>
               <code className="text-xs font-mono text-blue-600 dark:text-blue-400">{targetSnippet}</code>
             </div>
@@ -53,7 +53,7 @@ export function LearningBar({
             <div className="flex-1 space-y-1 hidden lg:block">
               <div className="flex items-center gap-2">
                 <Lightbulb size={12} className="text-yellow-500" />
-                <span className="text-[10px] font-medium text-zinc-400 uppercase">Por que?</span>
+                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase">Por que?</span>
               </div>
               <p className="text-[11px] italic text-zinc-500 dark:text-zinc-400 leading-relaxed">
                 &quot;{explanation}&quot;

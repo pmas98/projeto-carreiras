@@ -243,7 +243,7 @@ export function FramerTask() {
                   >
                     <Sparkles size={32} />
                   </motion.div>
-                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Uau, que fluido!</h2>
+                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Muito bom!</h2>
                   <p className="mt-2 text-zinc-600 dark:text-zinc-400">Suas micro-interações deram o toque premium que faltava.</p>
                   
                   <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">

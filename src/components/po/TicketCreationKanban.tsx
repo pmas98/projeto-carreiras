@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
@@ -16,6 +16,7 @@ import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverl
 import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
 import { useProgressStore } from "@/store/useProgressStore";
 import { INITIAL_TICKETS, type KanbanCard, type KanbanColumn } from "@/lib/po-tickets";
+import type { TaskId } from "@/lib/tasks";
 
 // ─── Column config ────────────────────────────────────────────────────────────
 
@@ -85,10 +86,14 @@ function KanbanCardView({
   card,
   colDef,
   onMove,
+  onDragStart,
+  onDragEnd,
 }: {
   card: KanbanCard;
   colDef: ColumnDef;
   onMove: (id: string, direction: "left" | "right") => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const colIndex = COLUMN_ORDER.indexOf(card.column);
@@ -96,111 +101,124 @@ function KanbanCardView({
   const canMoveRight = colIndex < COLUMN_ORDER.length - 1;
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.85 }}
-      transition={{ type: "spring", damping: 22, stiffness: 300 }}
-      className={`rounded-xl border-l-4 p-3 shadow-md ${colDef.cardBg} ${colDef.cardBorder}`}
+    <div
+      draggable={true}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/plain", card.id);
+        e.dataTransfer.effectAllowed = "move";
+        if (onDragStart) onDragStart();
+      }}
+      onDragEnd={() => {
+        if (onDragEnd) onDragEnd();
+      }}
+      className="cursor-grab active:cursor-grabbing transition-transform select-none w-full"
     >
-      {/* Top row */}
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-bold leading-snug text-white">{card.title}</p>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <span
-            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-              POINTS_COLOR[card.storyPoints] ?? "bg-slate-600 text-slate-200"
-            }`}
-          >
-            {card.storyPoints}pts
-          </span>
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            className="rounded p-0.5 text-slate-400 hover:bg-white/10 hover:text-white transition"
-            title={expanded ? "Recolher" : "Expandir"}
-          >
-            {expanded ? (
-              <Minimize2 className="h-3.5 w-3.5" />
-            ) : (
-              <Expand className="h-3.5 w-3.5" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* User story (always visible, truncated) */}
-      <p
-        className={`mt-1.5 text-xs leading-relaxed text-slate-400 ${
-          expanded ? "" : "line-clamp-2"
-        }`}
+      <motion.div
+        layout
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.85 }}
+        transition={{ type: "spring", damping: 22, stiffness: 300 }}
+        className={`rounded-xl border-l-4 p-3 shadow-md hover:bg-slate-800/90 transition-all hover:scale-[1.01] ${colDef.cardBg} ${colDef.cardBorder}`}
       >
-        {card.userStory}
-      </p>
+        {/* Top row */}
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-sm font-bold leading-snug text-white">{card.title}</p>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                POINTS_COLOR[card.storyPoints] ?? "bg-slate-600 text-slate-200"
+              }`}
+            >
+              {card.storyPoints}pts
+            </span>
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              className="rounded p-0.5 text-slate-400 hover:bg-white/10 hover:text-white transition"
+              title={expanded ? "Recolher" : "Expandir"}
+            >
+              {expanded ? (
+                <Minimize2 className="h-3.5 w-3.5" />
+              ) : (
+                <Expand className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </div>
+        </div>
 
-      {/* Acceptance criteria (expanded only) */}
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="mt-3 space-y-1.5 border-t border-white/10 pt-3">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-                Critérios de Aceite
-              </p>
-              {card.acceptanceCriteria.map((ac, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                  <p className="text-xs text-slate-300 leading-relaxed">{ac}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+        {/* User story (always visible, truncated) */}
+        <p
+          className={`mt-1.5 text-xs leading-relaxed text-slate-400 ${
+            expanded ? "" : "line-clamp-2"
+          }`}
+        >
+          {card.userStory}
+        </p>
+
+        {/* Acceptance criteria (expanded only) */}
+        <AnimatePresence>
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-3 space-y-1.5 border-t border-white/10 pt-3">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                  Critérios de Aceite
+                </p>
+                {card.acceptanceCriteria.map((ac, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                    <p className="text-xs text-slate-300 leading-relaxed">{ac}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Move buttons */}
+        {card.column !== "done" && (
+          <div className="mt-3 flex justify-between gap-2 border-t border-white/10 pt-2">
+            <button
+              onClick={() => onMove(card.id, "left")}
+              disabled={!canMoveLeft}
+              className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition ${
+                canMoveLeft
+                  ? "text-slate-400 hover:bg-white/10 hover:text-white"
+                  : "cursor-not-allowed text-slate-700"
+              }`}
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Voltar
+            </button>
+            <button
+              onClick={() => onMove(card.id, "right")}
+              disabled={!canMoveRight}
+              className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition ${
+                canMoveRight
+                  ? "text-white hover:bg-white/10"
+                  : "cursor-not-allowed text-slate-700"
+              }`}
+            >
+              {colIndex === COLUMN_ORDER.length - 2 ? "Concluir ✓" : "Mover →"}
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
         )}
-      </AnimatePresence>
 
-      {/* Move buttons */}
-      {card.column !== "done" && (
-        <div className="mt-3 flex justify-between gap-2 border-t border-white/10 pt-2">
-          <button
-            onClick={() => onMove(card.id, "left")}
-            disabled={!canMoveLeft}
-            className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition ${
-              canMoveLeft
-                ? "text-slate-400 hover:bg-white/10 hover:text-white"
-                : "cursor-not-allowed text-slate-700"
-            }`}
-          >
-            <ChevronLeft className="h-3.5 w-3.5" />
-            Voltar
-          </button>
-          <button
-            onClick={() => onMove(card.id, "right")}
-            disabled={!canMoveRight}
-            className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition ${
-              canMoveRight
-                ? "text-white hover:bg-white/10"
-                : "cursor-not-allowed text-slate-700"
-            }`}
-          >
-            {colIndex === COLUMN_ORDER.length - 2 ? "Concluir ✓" : "Mover →"}
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      )}
-
-      {/* Done checkmark */}
-      {card.column === "done" && (
-        <div className="mt-2 flex items-center gap-1.5 border-t border-emerald-800/50 pt-2 text-xs text-emerald-400">
-          <CheckCircle2 className="h-3.5 w-3.5" />
-          Enviado para a sprint
-        </div>
-      )}
-    </motion.div>
+        {/* Done checkmark */}
+        {card.column === "done" && (
+          <div className="mt-2 flex items-center gap-1.5 border-t border-emerald-800/50 pt-2 text-xs text-emerald-400">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            Enviado para a sprint
+          </div>
+        )}
+      </motion.div>
+    </div>
   );
 }
 
@@ -214,12 +232,36 @@ export function TicketCreationKanban() {
   const isAlreadyDone = useProgressStore((s) =>
     s.completedTasks.includes("po_ticket_creation")
   );
-
   // Use stored tickets if available, else use defaults
   const [cards, setCards] = useState<KanbanCard[]>(() =>
     storedTickets.length > 0 ? storedTickets : INITIAL_TICKETS
   );
   const [taskCompleted, setTaskCompleted] = useState(false);
+
+  const completedTasks = useProgressStore((s) => s.completedTasks);
+
+  const allPoTasksDone = useMemo(() => {
+    const poTaskIds: TaskId[] = ["po_stakeholder_meeting", "po_defining_product", "po_ticket_creation"];
+    return poTaskIds.every(id => id === "po_ticket_creation" ? (taskCompleted || isAlreadyDone) : completedTasks.includes(id));
+  }, [completedTasks, taskCompleted, isAlreadyDone]);
+
+  const [activeDragCardId, setActiveDragCardId] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<KanbanColumn | null>(null);
+
+  const handleDrop = useCallback((e: React.DragEvent, targetColumn: KanbanColumn) => {
+    e.preventDefault();
+    const cardId = e.dataTransfer.getData("text/plain");
+    if (!cardId) return;
+
+    setCards((prev) =>
+      prev.map((card) => {
+        if (card.id !== cardId) return card;
+        return { ...card, column: targetColumn };
+      })
+    );
+    setDragOverColumn(null);
+    setActiveDragCardId(null);
+  }, []);
 
   const doneCount = cards.filter((c) => c.column === "done").length;
   const totalCount = cards.length;
@@ -336,15 +378,42 @@ export function TicketCreationKanban() {
                 </div>
 
                 {/* Cards */}
-                <div className="flex min-h-[120px] flex-col gap-2">
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDragEnter={() => {
+                    if (dragOverColumn !== colDef.id) setDragOverColumn(colDef.id);
+                  }}
+                  onDragLeave={() => {
+                    setDragOverColumn(null);
+                  }}
+                  onDrop={(e) => handleDrop(e, colDef.id)}
+                  className={`flex min-h-[160px] flex-col gap-2 rounded-xl p-2 transition-all duration-200 ${
+                    dragOverColumn === colDef.id
+                      ? "bg-white/5 ring-2 ring-dashed ring-emerald-500/30 scale-[0.99] shadow-inner shadow-emerald-500/5"
+                      : "bg-transparent"
+                  }`}
+                >
                   <AnimatePresence mode="popLayout">
                     {colCards.map((card) => (
-                      <KanbanCardView
+                      <div
                         key={card.id}
-                        card={card}
-                        colDef={colDef}
-                        onMove={moveCard}
-                      />
+                        className={
+                          activeDragCardId && activeDragCardId !== card.id
+                            ? "pointer-events-none"
+                            : ""
+                        }
+                      >
+                        <KanbanCardView
+                          card={card}
+                          colDef={colDef}
+                          onMove={moveCard}
+                          onDragStart={() => setActiveDragCardId(card.id)}
+                          onDragEnd={() => {
+                            setActiveDragCardId(null);
+                            setDragOverColumn(null);
+                          }}
+                        />
+                      </div>
                     ))}
                   </AnimatePresence>
 
@@ -352,9 +421,17 @@ export function TicketCreationKanban() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="flex-1 rounded-xl border-2 border-dashed border-white/10 px-3 py-6 text-center text-xs text-slate-600"
+                      className={`flex-1 rounded-xl border-2 border-dashed px-3 py-6 text-center text-xs transition-colors duration-200 ${
+                        dragOverColumn === colDef.id
+                          ? "border-emerald-500/40 text-emerald-400"
+                          : "border-white/10 text-slate-600"
+                      }`}
                     >
-                      {colDef.id === "done" ? "Mova os cartões para cá para concluir" : "Vazio"}
+                      {dragOverColumn === colDef.id
+                        ? "Solte o cartão aqui!"
+                        : colDef.id === "done"
+                        ? "Mova os cartões para cá para concluir"
+                        : "Vazio"}
                     </motion.div>
                   )}
                 </div>
@@ -397,7 +474,9 @@ export function TicketCreationKanban() {
                 {taskCompleted || isAlreadyDone ? (
                   <div className="flex items-center gap-2 text-sm text-emerald-400">
                     <CheckCircle2 className="h-4 w-4" />
-                    Tarefa concluída — trilha de PO finalizada!
+                    {allPoTasksDone
+                      ? "Tarefa concluída — trilha de PO finalizada!"
+                      : "Tarefa concluída! Complete as outras tarefas para finalizar a trilha."}
                   </div>
                 ) : (
                   <motion.button

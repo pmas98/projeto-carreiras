@@ -29,7 +29,7 @@ export function DeploymentPipelineTask() {
     setIsRunning(true);
     setCurrentStepIndex(0);
     
-    const newSteps = [...steps].map(s => ({ ...s, status: 'idle' as const }));
+    const newSteps: PipelineStep[] = steps.map((s) => ({ ...s, status: "idle" }));
     setSteps(newSteps);
 
     for (let i = 0; i < steps.length; i++) {

@@ -20,6 +20,9 @@ import { TaskShell } from "@/components/frontend/TaskShell";
 import { EducationalTooltip } from "@/components/frontend/EducationalTooltip";
 import { useTaskValidation } from "@/hooks/useTaskValidation";
 import { useProgressStore } from "@/store/useProgressStore";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
+import { NetworkVisualizer } from "../NetworkVisualizer";
 
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 type Header = { id: number; key: string; value: string };
@@ -232,8 +235,10 @@ export function AuthTask() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [jwtSection, setJwtSection] = useState<"header" | "payload" | null>(null);
   const [showModal, setShowModal] = useState(true);
+  const [responseTab, setResponseTab] = useState<"visual" | "json">("visual");
   const resetTask = useProgressStore((s) => s.resetTask);
   const router = useRouter();
+  const tutorial = useGuidedTutorial("backend_auth");
 
   const parsedBody = parseBody(body);
   const hasContentType = headers.some(
@@ -252,7 +257,10 @@ export function AuthTask() {
     if (!isComplete || response) return;
     const saved = localStorage.getItem("resp_backend_auth");
     if (!saved) return;
-    try { setResponse(JSON.parse(saved) as ResponseData); } catch {}
+    try {
+      setResponse(JSON.parse(saved) as ResponseData);
+      setResponseTab("json");
+    } catch {}
   }, [isComplete, response]);
 
   const handleSend = useCallback(() => {
@@ -265,6 +273,7 @@ export function AuthTask() {
       const result = getMockResponse(method, url, headers, body);
       setResponse(result);
       if (result.status === 200) {
+        setResponseTab("json");
         try { localStorage.setItem("resp_backend_auth", JSON.stringify(result)); } catch {}
       }
       setIsSending(false);
@@ -288,6 +297,7 @@ export function AuthTask() {
     setResponse(null);
     setJwtSection(null);
     setShowModal(true);
+    setResponseTab("visual");
     try { localStorage.removeItem("resp_backend_auth"); } catch {}
     resetTask("backend_auth");
   };
@@ -301,6 +311,7 @@ export function AuthTask() {
       subtitle="Construa um payload POST para obter um token JWT."
       backHref="/backend"
       onHelpClick={() => setHelpOpen(true)}
+      onReplayTutorial={tutorial.start}
     >
       <div className="flex flex-1 flex-col lg:flex-row h-full overflow-hidden">
         {/* Brief sidebar */}
@@ -520,6 +531,7 @@ export function AuthTask() {
                   </div>
                 </div>
                 <textarea
+                  data-tutorial="backend-auth-payload"
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   rows={5}
@@ -537,6 +549,32 @@ export function AuthTask() {
 
           {/* Response panel */}
           <div className="flex flex-1 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-900/50">
+            {/* Tab switchers if response or initial */}
+            {!isSending && (
+              <div className="flex border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-1.5 gap-2">
+                <button
+                  onClick={() => setResponseTab("visual")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+                    responseTab === "visual"
+                      ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-xs"
+                      : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  Fluxo de Rede (Visual)
+                </button>
+                <button
+                  onClick={() => setResponseTab("json")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+                    responseTab === "json"
+                      ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-xs"
+                      : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  JSON da Resposta (Dados)
+                </button>
+              </div>
+            )}
+
             {isSending && (
               <div className="flex flex-1 items-center justify-center">
                 <motion.div
@@ -547,136 +585,150 @@ export function AuthTask() {
               </div>
             )}
 
-            {!isSending && !response && (
-              <div className="flex flex-1 items-center justify-center">
-                <p className="text-sm text-zinc-400 dark:text-zinc-600">
-                  A resposta aparecerá aqui após enviar a requisição.
-                </p>
-              </div>
+            {!isSending && responseTab === "visual" && (
+              <NetworkVisualizer
+                method={method}
+                url={url}
+                headers={headers}
+                body={body}
+                response={response}
+                isSending={isSending}
+                taskId="backend_auth"
+              />
             )}
 
-            {!isSending && response && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-1 flex-col overflow-hidden p-4 gap-3"
-              >
-                {/* Status bar */}
-                <div className="flex items-center gap-3">
-                  <span className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${statusColor(response.status)}`}>
-                    {response.status} {response.statusText}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
-                    <Clock className="h-3 w-3" />
-                    {response.timeMs}ms
-                  </span>
-                  {response.status === 200 && (
-                    <button
-                      onClick={() => setTooltip(DEFINITIONS.jwt)}
-                      className="ml-auto text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                    >
-                      <Info className="h-3 w-3" />
-                      O que é um JWT?
-                    </button>
-                  )}
-                </div>
-
-                {/* JWT Decoder (only on success) */}
-                {isJwtResponse ? (
-                  <div className="flex flex-1 flex-col gap-3 overflow-auto">
-                    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Key className="h-4 w-4 text-amber-500" />
-                        <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-50">
-                          Token JWT recebido
-                        </span>
-                        <span className="ml-auto text-[10px] text-zinc-400">
-                          Clique em uma parte para decodificar
-                        </span>
-                      </div>
-
-                      {/* JWT visual — 3 clickable parts */}
-                      <div className="flex flex-wrap gap-0.5 font-mono text-[11px] leading-relaxed break-all">
+            {!isSending && responseTab === "json" && (
+              <>
+                {!response ? (
+                  <div className="flex flex-1 items-center justify-center">
+                    <p className="text-sm text-zinc-400 dark:text-zinc-600">
+                      A resposta aparecerá aqui após enviar a requisição.
+                    </p>
+                  </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-1 flex-col overflow-hidden p-4 gap-3"
+                  >
+                    {/* Status bar */}
+                    <div className="flex items-center gap-3">
+                      <span className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${statusColor(response.status)}`}>
+                        {response.status} {response.statusText}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
+                        <Clock className="h-3 w-3" />
+                        {response.timeMs}ms
+                      </span>
+                      {response.status === 200 && (
                         <button
-                          onClick={() => setJwtSection((s) => (s === "header" ? null : "header"))}
-                          className={`rounded px-1 py-0.5 transition ${
-                            jwtSection === "header"
-                              ? "bg-rose-500 text-white"
-                              : "bg-rose-100 text-rose-700 hover:bg-rose-200 dark:bg-rose-900/30 dark:text-rose-300"
-                          }`}
+                          onClick={() => setTooltip(DEFINITIONS.jwt)}
+                          className="ml-auto text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
                         >
-                          {jwtParts[0]}
+                          <Info className="h-3 w-3" />
+                          O que é um JWT?
                         </button>
-                        <span className="text-zinc-400">.</span>
-                        <button
-                          onClick={() => setJwtSection((s) => (s === "payload" ? null : "payload"))}
-                          className={`rounded px-1 py-0.5 transition ${
-                            jwtSection === "payload"
-                              ? "bg-violet-500 text-white"
-                              : "bg-violet-100 text-violet-700 hover:bg-violet-200 dark:bg-violet-900/30 dark:text-violet-300"
-                          }`}
-                        >
-                          {jwtParts[1]}
-                        </button>
-                        <span className="text-zinc-400">.</span>
-                        <span className="rounded px-1 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 cursor-default">
-                          {jwtParts[2]}
-                        </span>
-                      </div>
-
-                      {/* Decoded section */}
-                      <AnimatePresence>
-                        {jwtSection && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden"
-                          >
-                            <div className={`mt-3 rounded-lg p-3 ${jwtSection === "header" ? "bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800" : "bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800"}`}>
-                              <div className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${jwtSection === "header" ? "text-rose-600 dark:text-rose-400" : "text-violet-600 dark:text-violet-400"}`}>
-                                {jwtSection === "header" ? "Header — algoritmo e tipo" : "Payload — dados do usuário (base64, não criptografado)"}
-                              </div>
-                              <pre className="text-[11px] font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
-                                {jwtSection === "header" ? JWT_DECODED.header : JWT_DECODED.payload}
-                              </pre>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {!jwtSection && (
-                        <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] text-center">
-                          <div className="rounded-lg bg-rose-50 dark:bg-rose-900/20 p-2 text-rose-700 dark:text-rose-300">
-                            <div className="font-bold">Header</div>
-                            <div className="text-rose-500 dark:text-rose-400">Algoritmo</div>
-                          </div>
-                          <div className="rounded-lg bg-violet-50 dark:bg-violet-900/20 p-2 text-violet-700 dark:text-violet-300">
-                            <div className="font-bold">Payload</div>
-                            <div className="text-violet-500 dark:text-violet-400">Dados do user</div>
-                          </div>
-                          <div className="rounded-lg bg-zinc-100 dark:bg-zinc-800 p-2 text-zinc-500 dark:text-zinc-400">
-                            <div className="font-bold">Signature</div>
-                            <div>Verificação</div>
-                          </div>
-                        </div>
                       )}
                     </div>
 
-                    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-auto">
-                      <pre className="p-4 text-[11px] leading-relaxed font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
-                        {response.body}
-                      </pre>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex-1 overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-                    <pre className="p-4 text-[11px] leading-relaxed font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
-                      {response.body}
-                    </pre>
-                  </div>
+                    {/* JWT Decoder (only on success) */}
+                    {isJwtResponse ? (
+                      <div className="flex flex-1 flex-col gap-3 overflow-auto">
+                        <div data-tutorial="backend-auth-token" className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Key className="h-4 w-4 text-amber-500" />
+                            <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-50">
+                              Token JWT recebido
+                            </span>
+                            <span className="ml-auto text-[10px] text-zinc-400">
+                              Clique em uma parte para decodificar
+                            </span>
+                          </div>
+
+                          {/* JWT visual — 3 clickable parts */}
+                          <div className="flex flex-wrap gap-0.5 font-mono text-[11px] leading-relaxed break-all">
+                            <button
+                              onClick={() => setJwtSection((s) => (s === "header" ? null : "header"))}
+                              className={`rounded px-1 py-0.5 transition ${
+                                jwtSection === "header"
+                                  ? "bg-rose-500 text-white"
+                                  : "bg-rose-100 text-rose-700 hover:bg-rose-200 dark:bg-rose-900/30 dark:text-rose-300"
+                              }`}
+                            >
+                              {jwtParts[0]}
+                            </button>
+                            <span className="text-zinc-400">.</span>
+                            <button
+                              onClick={() => setJwtSection((s) => (s === "payload" ? null : "payload"))}
+                              className={`rounded px-1 py-0.5 transition ${
+                                jwtSection === "payload"
+                                  ? "bg-violet-500 text-white"
+                                  : "bg-violet-100 text-violet-700 hover:bg-violet-200 dark:bg-violet-900/30 dark:text-violet-300"
+                              }`}
+                            >
+                              {jwtParts[1]}
+                            </button>
+                            <span className="text-zinc-400">.</span>
+                            <span className="rounded px-1 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 cursor-default">
+                              {jwtParts[2]}
+                            </span>
+                          </div>
+
+                          {/* Decoded section */}
+                          <AnimatePresence>
+                            {jwtSection && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden"
+                              >
+                                <div className={`mt-3 rounded-lg p-3 ${jwtSection === "header" ? "bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800" : "bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800"}`}>
+                                  <div className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${jwtSection === "header" ? "text-rose-600 dark:text-rose-400" : "text-violet-600 dark:text-violet-400"}`}>
+                                    {jwtSection === "header" ? "Header — algoritmo e tipo" : "Payload — dados do usuário (base64, não criptografado)"}
+                                  </div>
+                                  <pre className="text-[11px] font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+                                    {jwtSection === "header" ? JWT_DECODED.header : JWT_DECODED.payload}
+                                  </pre>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          {!jwtSection && (
+                            <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] text-center">
+                              <div className="rounded-lg bg-rose-50 dark:bg-rose-900/20 p-2 text-rose-700 dark:text-rose-300">
+                                <div className="font-bold">Header</div>
+                                <div className="text-rose-500 dark:text-rose-400">Algoritmo</div>
+                              </div>
+                              <div className="rounded-lg bg-violet-50 dark:bg-violet-900/20 p-2 text-violet-700 dark:text-violet-300">
+                                <div className="font-bold">Payload</div>
+                                <div className="text-violet-500 dark:text-violet-400">Dados do user</div>
+                              </div>
+                              <div className="rounded-lg bg-zinc-100 dark:bg-zinc-800 p-2 text-zinc-500 dark:text-zinc-400">
+                                <div className="font-bold">Signature</div>
+                                <div>Verificação</div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-auto">
+                          <pre className="p-4 text-[11px] leading-relaxed font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
+                            {response.body}
+                          </pre>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex-1 overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                        <pre className="p-4 text-[11px] leading-relaxed font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
+                          {response.body}
+                        </pre>
+                      </div>
+                    )}
+                  </motion.div>
                 )}
-              </motion.div>
+              </>
             )}
           </div>
         </div>
@@ -742,6 +794,7 @@ export function AuthTask() {
         content="Use POST como método. Adicione o header Content-Type: application/json na aba Headers. Na aba Body, preencha o JSON com o email e a senha que aparecem na documentação à esquerda."
         hint="A aba Body já tem o template com a estrutura correta. Basta preencher os valores com as credenciais da documentação."
       />
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </TaskShell>
   );
 }

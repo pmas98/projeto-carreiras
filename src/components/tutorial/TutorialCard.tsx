@@ -73,13 +73,6 @@ export function TutorialCard({
           </div>
         ) : null}
 
-        {showMissingTargetHint ? (
-          <div className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 dark:border-blue-500/20 dark:bg-blue-500/10">
-            <p className="text-xs font-medium text-blue-800 dark:text-blue-300">
-              Nao encontramos o elemento destacado nesta etapa. Voce pode continuar normalmente pelo guia.
-            </p>
-          </div>
-        ) : null}
       </div>
 
       <footer className="mt-5 flex items-center justify-between gap-2">

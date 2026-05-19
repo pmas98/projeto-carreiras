@@ -2,6 +2,7 @@ import type { TaskId } from "@/lib/tasks";
 import type { PORequirement } from "@/lib/po-personas";
 import type { KanbanCard } from "@/lib/po-tickets";
 import { create } from "zustand";
+import { captureEvent } from "@/lib/posthog";
 
 export type { KanbanCard } from "@/lib/po-tickets";
 export type { PORequirement } from "@/lib/po-personas";
@@ -124,6 +125,23 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
   markTaskComplete: (taskId) => {
     const existing = get().completedTasks;
     if (existing.includes(taskId)) return;
+
+    let durationSeconds: number | undefined = undefined;
+    if (typeof window !== "undefined") {
+      const startKey = `task_start_${taskId}`;
+      const startTimeStr = window.sessionStorage.getItem(startKey);
+      if (startTimeStr) {
+        durationSeconds = (Date.now() - parseInt(startTimeStr, 10)) / 1000;
+        durationSeconds = parseFloat(durationSeconds.toFixed(2));
+        window.sessionStorage.removeItem(startKey);
+      }
+    }
+
+    captureEvent("task_completed", {
+      task_id: taskId,
+      duration_seconds: durationSeconds,
+    });
+
     set({ completedTasks: [...existing, taskId] });
   },
   
@@ -174,6 +192,10 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
   },
 
   resetProgress: () => {
+    captureEvent("progress_reset", {
+      completed_tasks_count: get().completedTasks.length,
+    });
+
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(TASKS_KEY);
       window.localStorage.removeItem(PO_KEY);
@@ -198,6 +220,10 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
   },
 
   setPoStakeholderOutcome: (outcome, moodScore) => {
+    captureEvent("po_stakeholder_outcome", {
+      outcome,
+      mood_score: moodScore,
+    });
     set({ poStakeholderOutcome: outcome, poMoodScore: moodScore });
   },
 

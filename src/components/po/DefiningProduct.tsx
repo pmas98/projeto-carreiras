@@ -184,7 +184,6 @@ export function DefiningProduct() {
 
   const [selectedPersonas, setSelectedPersonas] = useState<Set<PersonaId>>(new Set());
   const [selectedModels, setSelectedModels] = useState<Set<BusinessModelId>>(new Set());
-  const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedRequirements, setExtractedRequirements] = useState<PORequirement[]>(
     existingDraft.length > 0 ? existingDraft : []
@@ -194,57 +193,63 @@ export function DefiningProduct() {
   const canExtract = selectedPersonas.size > 0 && selectedModels.size > 0;
   const isExtracted = extractedRequirements.length > 0;
 
+  // Derive sticky notes dynamically to avoid stale state synchronization, double-renders, and duplicate key warnings
+  const stickyNotes: StickyNote[] = [];
+  let rotationIndex = 0;
+
+  selectedPersonas.forEach((id) => {
+    const persona = PERSONAS.find((p) => p.id === id);
+    if (!persona) return;
+    persona.notes.forEach((text, i) => {
+      stickyNotes.push({
+        id: `${id}-note-${i}`,
+        text,
+        noteColor: persona.noteColor,
+        rotation: NOTE_ROTATIONS[rotationIndex % NOTE_ROTATIONS.length],
+        source: persona.name,
+      });
+      rotationIndex++;
+    });
+  });
+
+  selectedModels.forEach((id) => {
+    const model = BUSINESS_MODELS.find((m) => m.id === id);
+    if (!model) return;
+    model.notes.forEach((text, i) => {
+      stickyNotes.push({
+        id: `${id}-note-${i}`,
+        text,
+        noteColor: model.noteColor,
+        rotation: NOTE_ROTATIONS[(rotationIndex + 4) % NOTE_ROTATIONS.length],
+        source: model.name,
+      });
+      rotationIndex++;
+    });
+  });
+
   const togglePersona = useCallback((id: PersonaId) => {
     setSelectedPersonas((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
-        // Remove related notes
-        setStickyNotes((notes) =>
-          notes.filter((n) => n.source !== PERSONAS.find((p) => p.id === id)?.name)
-        );
       } else {
         next.add(id);
-        const persona = PERSONAS.find((p) => p.id === id)!;
-        // Add sticky notes with staggered delay
-        const newNotes: StickyNote[] = persona.notes.map((text, i) => ({
-          id: `${id}-note-${i}`,
-          text,
-          noteColor: persona.noteColor,
-          rotation: NOTE_ROTATIONS[(stickyNotes.length + i) % NOTE_ROTATIONS.length],
-          source: persona.name,
-        }));
-        setStickyNotes((n) => [...n, ...newNotes]);
       }
       return next;
     });
-  }, [stickyNotes.length]);
+  }, []);
 
   const toggleModel = useCallback((id: BusinessModelId) => {
     setSelectedModels((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
-        setStickyNotes((notes) =>
-          notes.filter(
-            (n) => n.source !== BUSINESS_MODELS.find((m) => m.id === id)?.name
-          )
-        );
       } else {
         next.add(id);
-        const model = BUSINESS_MODELS.find((m) => m.id === id)!;
-        const newNotes: StickyNote[] = model.notes.map((text, i) => ({
-          id: `${id}-note-${i}`,
-          text,
-          noteColor: model.noteColor,
-          rotation: NOTE_ROTATIONS[(stickyNotes.length + i + 4) % NOTE_ROTATIONS.length],
-          source: model.name,
-        }));
-        setStickyNotes((n) => [...n, ...newNotes]);
       }
       return next;
     });
-  }, [stickyNotes.length]);
+  }, []);
 
   const handleExtract = useCallback(() => {
     if (!canExtract) return;

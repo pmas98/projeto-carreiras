@@ -18,6 +18,9 @@ import { TaskShell } from "@/components/frontend/TaskShell";
 import { EducationalTooltip } from "@/components/frontend/EducationalTooltip";
 import { useTaskValidation } from "@/hooks/useTaskValidation";
 import { useProgressStore } from "@/store/useProgressStore";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
+import { NetworkVisualizer } from "../NetworkVisualizer";
 
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -181,8 +184,10 @@ export function ApiClientTask() {
   const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [showModal, setShowModal] = useState(true);
+  const [responseTab, setResponseTab] = useState<"visual" | "json">("visual");
   const resetTask = useProgressStore((s) => s.resetTask);
   const router = useRouter();
+  const tutorial = useGuidedTutorial("backend_api_client");
 
   const requestState = { method, url, headers };
 
@@ -252,6 +257,7 @@ export function ApiClientTask() {
       subtitle="Construa a requisição HTTP correta para acessar os dados."
       backHref="/backend"
       onHelpClick={() => setHelpOpen(true)}
+      onReplayTutorial={tutorial.start}
     >
       <div className="flex flex-1 flex-col lg:flex-row h-full overflow-hidden">
         {/* Brief sidebar */}
@@ -316,7 +322,7 @@ export function ApiClientTask() {
         {/* Main workspace */}
         <div className="flex flex-1 flex-col overflow-hidden">
           {/* Request builder */}
-          <div className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 space-y-4">
+          <div data-tutorial="backend-api-request-builder" className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 space-y-4">
             {/* Method + URL + Send */}
             <div className="flex gap-2">
               {/* Method selector */}
@@ -367,6 +373,7 @@ export function ApiClientTask() {
 
               {/* Send button */}
               <button
+                data-tutorial="backend-api-send"
                 onClick={handleSend}
                 disabled={isSending || !url.trim()}
                 className="flex h-10 items-center gap-2 rounded-lg bg-zinc-900 px-4 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:opacity-40 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
@@ -434,6 +441,32 @@ export function ApiClientTask() {
 
           {/* Response panel */}
           <div className="flex flex-1 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-900/50">
+            {/* Tab switchers if response or initial */}
+            {!isSending && (
+              <div className="flex border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-1.5 gap-2">
+                <button
+                  onClick={() => setResponseTab("visual")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+                    responseTab === "visual"
+                      ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-xs"
+                      : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  Fluxo de Rede (Visual)
+                </button>
+                <button
+                  onClick={() => setResponseTab("json")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+                    responseTab === "json"
+                      ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-xs"
+                      : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  JSON da Resposta (Dados)
+                </button>
+              </div>
+            )}
+
             {isSending && (
               <div className="flex flex-1 items-center justify-center">
                 <motion.div
@@ -444,47 +477,60 @@ export function ApiClientTask() {
               </div>
             )}
 
-            {!isSending && !response && (
-              <div className="flex flex-1 items-center justify-center">
-                <p className="text-sm text-zinc-400 dark:text-zinc-600">
-                  A resposta aparecerá aqui após enviar a requisição.
-                </p>
-              </div>
+            {!isSending && responseTab === "visual" && (
+              <NetworkVisualizer
+                method={method}
+                url={url}
+                headers={headers}
+                response={response}
+                isSending={isSending}
+                taskId="backend_api_client"
+              />
             )}
 
-            {!isSending && response && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-1 flex-col overflow-hidden p-4 gap-3"
-              >
-                {/* Status bar */}
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${statusColor(response.status)}`}
+            {!isSending && responseTab === "json" && (
+              <>
+                {!response ? (
+                  <div className="flex flex-1 items-center justify-center">
+                    <p className="text-sm text-zinc-400 dark:text-zinc-600">
+                      A resposta aparecerá aqui após enviar a requisição.
+                    </p>
+                  </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-1 flex-col overflow-hidden p-4 gap-3"
                   >
-                    {response.status} {response.statusText}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
-                    <Clock className="h-3 w-3" />
-                    {response.timeMs}ms
-                  </span>
-                  <button
-                    onClick={() => setTooltip(DEFINITIONS.statusCode)}
-                    className="ml-auto text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                  >
-                    <Info className="h-3 w-3" />
-                    O que é isso?
-                  </button>
-                </div>
+                    {/* Status bar */}
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${statusColor(response.status)}`}
+                      >
+                        {response.status} {response.statusText}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
+                        <Clock className="h-3 w-3" />
+                        {response.timeMs}ms
+                      </span>
+                      <button
+                        onClick={() => setTooltip(DEFINITIONS.statusCode)}
+                        className="ml-auto text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                      >
+                        <Info className="h-3 w-3" />
+                        O que é isso?
+                      </button>
+                    </div>
 
-                {/* Response body */}
-                <div className="flex-1 overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-                  <pre className="p-4 text-[11px] leading-relaxed font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
-                    {response.body}
-                  </pre>
-                </div>
-              </motion.div>
+                    {/* Response body */}
+                    <div className="flex-1 overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                      <pre className="p-4 text-[11px] leading-relaxed font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
+                        {response.body}
+                      </pre>
+                    </div>
+                  </motion.div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -551,6 +597,7 @@ export function ApiClientTask() {
         content="Use o dropdown para selecionar o método HTTP. Digite a URL no campo ao lado. Adicione um header preenchendo a chave e o valor, depois clique em Enviar."
         hint="A documentação da API no painel esquerdo tem tudo que você precisa. Siga o checklist de cima para baixo."
       />
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </TaskShell>
   );
 }

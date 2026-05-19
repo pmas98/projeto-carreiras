@@ -253,9 +253,7 @@ export function RoleTasksPanel({ role }: Readonly<{ role: CareerRole }>) {
           Mentor
         </div>
         <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
-          {role === "productOwner" || role === "frontend" || role === "devOps"
-            ? `Cada tarefa de ${meta.label} é uma simulação totalmente interativa. Você enfrentará desafios reais do dia a dia, com feedback imediato.`
-            : "Você receberá dicas específicas da função enquanto trabalha em cada tarefa. Por enquanto, esta página é uma estrutura de roteamento e progresso."}
+          {`Cada tarefa de ${meta.label} é uma simulação totalmente interativa. Você enfrentará desafios reais do dia a dia, com feedback imediato.`}
         </p>
       </div>
       {shouldUseCardTutorials ? <GuidedTutorialOverlay tutorial={tutorial} /> : null}

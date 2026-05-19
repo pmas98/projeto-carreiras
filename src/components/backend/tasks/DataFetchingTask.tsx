@@ -22,6 +22,10 @@ import { TaskShell } from "@/components/frontend/TaskShell";
 import { EducationalTooltip } from "@/components/frontend/EducationalTooltip";
 import { useTaskValidation } from "@/hooks/useTaskValidation";
 import { useProgressStore } from "@/store/useProgressStore";
+import { GuidedTutorialOverlay } from "@/components/tutorial/GuidedTutorialOverlay";
+import { useGuidedTutorial } from "@/hooks/useGuidedTutorial";
+import { NetworkVisualizer } from "../NetworkVisualizer";
+import type { TaskId } from "@/lib/tasks";
 
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 type Header = { id: number; key: string; value: string };
@@ -189,12 +193,14 @@ export function DataFetchingTask() {
   const [methodOpen, setMethodOpen] = useState(false);
   const [response, setResponse]     = useState<ResponseData | null>(null);
   const [isSending, setIsSending]   = useState(false);
+  const [responseTab, setResponseTab] = useState<"visual" | "json">("visual");
   const [tooltip, setTooltip]       = useState<TooltipInfo | null>(null);
   const [helpOpen, setHelpOpen]     = useState(false);
   const [copied, setCopied]         = useState(false);
   const [showModal, setShowModal]   = useState(true);
   const resetTask = useProgressStore((s) => s.resetTask);
   const router = useRouter();
+  const tutorial = useGuidedTutorial("backend_data_fetching");
 
   const effectiveUrl = useMemo(() => {
     const active = params.filter((p) => p.enabled && p.key.trim() && p.value.trim());
@@ -226,11 +232,20 @@ export function DataFetchingTask() {
       s.responseStatus === 200,
   });
 
+  const completedTasks = useProgressStore((s) => s.completedTasks);
+  const allBackendTasksDone = useMemo(() => {
+    const backendTaskIds: TaskId[] = ["backend_api_client", "backend_auth", "backend_data_fetching"];
+    return backendTaskIds.every(id => id === "backend_data_fetching" ? isComplete : completedTasks.includes(id));
+  }, [completedTasks, isComplete]);
+
   useEffect(() => {
     if (!isComplete || response) return;
     const saved = localStorage.getItem("resp_backend_data_fetching");
     if (!saved) return;
-    try { setResponse(JSON.parse(saved) as ResponseData); } catch {}
+    try {
+      setResponse(JSON.parse(saved) as ResponseData);
+      setResponseTab("json");
+    } catch {}
   }, [isComplete, response]);
 
   const handleSend = useCallback(() => {
@@ -241,6 +256,7 @@ export function DataFetchingTask() {
       const result = getMockResponse(method, url, headers, params);
       setResponse(result);
       if (result.status === 200) {
+        setResponseTab("json");
         try { localStorage.setItem("resp_backend_data_fetching", JSON.stringify(result)); } catch {}
       }
       setIsSending(false);
@@ -278,6 +294,7 @@ export function DataFetchingTask() {
     setHeaders([{ id: nextId++, key: "", value: "" }]);
     setParams([{ id: nextId++, key: "", value: "", enabled: true }]);
     setResponse(null);
+    setResponseTab("visual");
     setShowModal(true);
     try { localStorage.removeItem("resp_backend_data_fetching"); } catch {}
     resetTask("backend_data_fetching");
@@ -289,6 +306,7 @@ export function DataFetchingTask() {
       subtitle="Use o JWT para acessar o endpoint protegido e filtre os resultados."
       backHref="/backend"
       onHelpClick={() => setHelpOpen(true)}
+      onReplayTutorial={tutorial.start}
     >
       <div className="flex flex-1 flex-col lg:flex-row h-full overflow-hidden">
         {/* Sidebar */}
@@ -425,7 +443,10 @@ export function DataFetchingTask() {
             {/* Tabs */}
             <div className="flex gap-1 border-b border-zinc-100 dark:border-zinc-900">
               {(["headers", "params"] as ActiveTab[]).map((tab) => (
-                <button key={tab} onClick={() => setActiveTab(tab)}
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  data-tutorial={tab === "headers" ? "backend-fetch-auth-header" : "backend-fetch-filters"}
                   className={`px-3 py-1.5 text-xs font-medium capitalize transition border-b-2 -mb-px ${
                     activeTab === tab
                       ? "border-zinc-900 text-zinc-900 dark:border-zinc-50 dark:text-zinc-50"
@@ -527,6 +548,31 @@ export function DataFetchingTask() {
 
           {/* Response panel */}
           <div className="flex flex-1 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-900/50">
+            {!isSending && (
+              <div className="flex border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-1.5 gap-2">
+                <button
+                  onClick={() => setResponseTab("visual")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+                    responseTab === "visual"
+                      ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-xs"
+                      : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  Fluxo de Rede (Visual)
+                </button>
+                <button
+                  onClick={() => setResponseTab("json")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+                    responseTab === "json"
+                      ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-xs"
+                      : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  JSON da Resposta (Dados)
+                </button>
+              </div>
+            )}
+
             {isSending && (
               <div className="flex flex-1 items-center justify-center">
                 <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
@@ -534,32 +580,50 @@ export function DataFetchingTask() {
               </div>
             )}
 
-            {!isSending && !response && (
-              <div className="flex flex-1 items-center justify-center">
-                <p className="text-sm text-zinc-400 dark:text-zinc-600">A resposta aparecerá aqui após enviar.</p>
-              </div>
+            {!isSending && responseTab === "visual" && (
+              <NetworkVisualizer
+                method={method}
+                url={url}
+                headers={headers}
+                response={response}
+                isSending={isSending}
+                taskId="backend_data_fetching"
+              />
             )}
 
-            {!isSending && response && (
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="flex flex-1 flex-col overflow-hidden p-4 gap-3">
-                  {/* Status bar */}
-                  <div className="flex items-center gap-3">
-                    <span className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${statusColor(response.status)}`}>
-                      {response.status} {response.statusText}
-                    </span>
-                    <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
-                      <Clock className="h-3 w-3" /> {response.timeMs}ms
-                    </span>
+            {!isSending && responseTab === "json" && (
+              <>
+                {!response ? (
+                  <div className="flex flex-1 items-center justify-center">
+                    <p className="text-sm text-zinc-400 dark:text-zinc-600">
+                      A resposta aparecerá aqui após enviar a requisição.
+                    </p>
                   </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-1 flex-col overflow-hidden p-4 gap-3"
+                  >
+                    {/* Status bar */}
+                    <div className="flex items-center gap-3">
+                      <span className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${statusColor(response.status)}`}>
+                        {response.status} {response.statusText}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
+                        <Clock className="h-3 w-3" /> {response.timeMs}ms
+                      </span>
+                    </div>
 
-                  {/* Response body */}
-                  <div className="flex-1 overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-                    <pre className="p-4 text-[11px] leading-relaxed font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
-                      {response.body}
-                    </pre>
-                  </div>
-              </motion.div>
+                    {/* Response body */}
+                    <div className="flex-1 overflow-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                      <pre className="p-4 text-[11px] leading-relaxed font-mono text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap break-words">
+                        {response.body}
+                      </pre>
+                    </div>
+                  </motion.div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -589,8 +653,14 @@ export function DataFetchingTask() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/50">
                 <ShieldCheck size={32} />
               </div>
-              <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Trilha concluída!</h2>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Você buscou os dados de calçados com autenticação JWT.</p>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+                {allBackendTasksDone ? "Trilha concluída!" : "Tarefa concluída!"}
+              </h2>
+              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                {allBackendTasksDone
+                  ? "Parabéns! Você completou todas as tarefas da trilha de Backend."
+                  : "Você buscou os dados de calçados com autenticação JWT."}
+              </p>
               <div className="mt-6 flex flex-col gap-3">
                 <button
                   onClick={handleReset}
@@ -603,7 +673,7 @@ export function DataFetchingTask() {
                   onClick={() => router.push("/backend")}
                   className="rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
                 >
-                  Acessar trilha →
+                  {allBackendTasksDone ? "Acessar trilha →" : "Voltar à trilha →"}
                 </button>
               </div>
             </motion.div>
@@ -617,6 +687,7 @@ export function DataFetchingTask() {
         title="Como completar esta tarefa"
         content="Na aba Headers, adicione Authorization com o valor Bearer seguido do JWT (disponível no painel esquerdo para copiar). Na aba Params, adicione category=calcados para filtrar os produtos."
         hint="Use o botão Copiar no painel esquerdo para pegar o valor completo do JWT e cole no campo de valor do header Authorization." />
+      <GuidedTutorialOverlay tutorial={tutorial} />
     </TaskShell>
   );
 }
